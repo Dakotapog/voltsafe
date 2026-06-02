@@ -72,7 +72,7 @@ export class SesionPage {
   private readonly toastCtrl       = inject(ToastController);
 
   /** Expone al template para el indicador "EN VIVO" */
-  readonly liveSessionId = this.liveTracking.sessionId;
+  readonly liveSesionId = this.liveTracking.sesionId;
 
   /**
    * Resumen de la última sesión finalizada.
@@ -327,14 +327,14 @@ export class SesionPage {
    * Si ya hay una sesión activa, muestra el link para copiarlo de nuevo.
    */
   async compartirEnVivo(): Promise<void> {
-    let sessionId = this.liveTracking.sessionId();
+    let sesionId = this.liveTracking.sesionId();
 
-    if (!sessionId) {
-      sessionId = this.liveTracking.generarSessionId();
-      await this.liveTracking.iniciarPublicacion(sessionId);
+    if (!sesionId) {
+      sesionId = this.liveTracking.generarSesionId();
+      await this.liveTracking.iniciarPublicacion(sesionId);
     }
 
-    const url = this.liveTracking.generarURLViewer(sessionId);
+    const url = this.liveTracking.generarURLViewer(sesionId);
     const texto = `📡 Sígueme en tiempo real:\n${url}`;
 
     const { Share } = await import('@capacitor/share');

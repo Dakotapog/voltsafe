@@ -74,7 +74,7 @@ export class MapaPage implements AfterViewInit, OnDestroy {
     // El tab ya terminó su animación — el contenedor tiene dimensiones reales
     this.mapaService.invalidarTamano();
 
-    const sessionId = this.viewer.liveSessionId();
+    const sessionId = this.viewer.liveSessionId(); // contiene sesionId del ?sesion= param
     const vp = this.viewer.params();
 
     if (sessionId) {

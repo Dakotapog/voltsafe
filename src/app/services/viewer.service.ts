@@ -42,8 +42,8 @@ export class ViewerService {
   parsearDesdeURL(): boolean {
     const search = new URLSearchParams(window.location.search);
 
-    // Modo live: ?session=vs-1234-abc
-    const sessionId = search.get('session');
+    // Modo live: ?sesion=vs-1234-abc
+    const sessionId = search.get('sesion');
     if (sessionId && sessionId.startsWith('vs-')) {
       this.liveSessionId.set(sessionId);
       return true;
