@@ -239,14 +239,15 @@ export class ExportService {
         .slice(0, 19);
       const nombreArchivo = `VoltSafe_${timestamp}.geojson`;
 
-      await Filesystem.writeFile({
+      const writeResult = await Filesystem.writeFile({
         path: nombreArchivo,
         data: JSON.stringify(geojson, null, 2),
         directory: Directory.Documents,
         encoding: Encoding.UTF8,
       });
 
-      this.ultimoArchivo.set(nombreArchivo);
+      // writeResult.uri es el content:// URI que Android necesita para Share API
+      this.ultimoArchivo.set(writeResult.uri ?? nombreArchivo);
 
       return {
         path: nombreArchivo,
@@ -271,14 +272,16 @@ export class ExportService {
     if (!archivo) return;
 
     try {
+      // files[] es el parámetro correcto para archivos locales en @capacitor/share v8
+      // url es solo para links web — pasarle un content:// no adjunta el archivo
       await Share.share({
         title: 'Reporte VoltSafe',
         text: 'Datos de movilidad ciclista en Bogotá — generados por VoltSafe',
-        url: archivo,
+        files: [archivo],
         dialogTitle: 'Compartir reporte',
       });
-    } catch {
-      // Si Share no disponible (web/dev), no hacer nada
+    } catch (err) {
+      console.error('[ExportService] compartir() falló:', err);
     }
   }
 
