@@ -2,6 +2,7 @@ import { Injectable, signal, inject } from '@angular/core';
 import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
 import { getDatabase, ref, set, onValue, off, DatabaseReference } from 'firebase/database';
 import { App } from '@capacitor/app';
+import { Geolocation } from '@capacitor/geolocation';
 import { environment } from '../../environments/environment';
 import { GeoService } from './geo.service';
 import { DeviceMonitorService } from './device-monitor.service';
@@ -91,19 +92,36 @@ export class LiveTrackingService {
   }
 
   private async publicarPosicion(sesionId: string): Promise<void> {
-    const pos = this.geo.posicionActual();
-    if (!pos) return;
+    // Preferir el Signal (ya calculado, filtrado) — fallback a getCurrentPosition
+    // cuando posicionActual es null (primera carga o browser sin GPS continuo).
+    let lat: number, lng: number, accuracy: number;
+    const posSignal = this.geo.posicionActual();
+
+    if (posSignal) {
+      lat      = posSignal.lat;
+      lng      = posSignal.lng;
+      accuracy = posSignal.accuracy ?? 15;
+    } else {
+      try {
+        const raw = await Geolocation.getCurrentPosition({ enableHighAccuracy: true });
+        lat      = raw.coords.latitude;
+        lng      = raw.coords.longitude;
+        accuracy = raw.coords.accuracy ?? 15;
+      } catch {
+        return; // sin posición disponible — reintentar en próximo intervalo
+      }
+    }
 
     const db     = getDatabase(this.getApp());
     const posRef = ref(db, `sessions/${sesionId}/pos`);
     const datos: PosicionViva = {
-      lat:      pos.lat,
-      lng:      pos.lng,
+      lat,
+      lng,
       bat:      this.deviceMonitor.nivelBateria(),
       km:       this.ruta.distanciaAcumulada_km(),
       kmh:      this.geo.velocidadMS() * 3.6,
       bri:      this.superficie.briActual(),
-      accuracy: pos.accuracy ?? 15,
+      accuracy,
       ts:       Date.now(),
     };
     await set(posRef, datos).catch((err) =>
