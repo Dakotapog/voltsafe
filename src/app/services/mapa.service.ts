@@ -303,6 +303,15 @@ export class MapaService {
     }
   }
 
+  /**
+   * Centra el mapa en coordenadas arbitrarias respetando el zoom actual.
+   * Usado por viewer mode para centrar en la posición del familiar.
+   */
+  centrarEnPosicion(lat: number, lng: number): void {
+    if (!this.map) return;
+    this.map.setView([lat, lng], this.map.getZoom(), { animate: true });
+  }
+
   // ============================================================
   // AGREGAR CAPA — PATRÓN MEDIATOR (TTC #9)
   // ============================================================

@@ -110,6 +110,19 @@ export class MapaPage implements AfterViewInit, OnDestroy {
   }
 
   centrar(): void {
+    // Viewer live: centrar en última posición recibida de Firebase
+    const posViva = this.liveTracking.posicionViva();
+    if (posViva) {
+      this.mapaService.centrarEnPosicion(posViva.lat, posViva.lng);
+      return;
+    }
+    // Viewer snapshot: centrar en posición de URL params
+    const vp = this.viewer.params();
+    if (vp) {
+      this.mapaService.centrarEnPosicion(vp.lat, vp.lng);
+      return;
+    }
+    // Modo normal: GPS propio del usuario
     this.mapaService.centrarEnUsuario();
   }
 
