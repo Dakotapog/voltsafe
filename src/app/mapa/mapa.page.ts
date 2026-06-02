@@ -13,6 +13,7 @@ import { SuperficieService } from '../services/superficie.service';
 import { GeoService } from '../services/geo.service';
 import { AutonomiaService } from '../services/autonomia.service';
 import { ViewerService } from '../services/viewer.service';
+import { LiveTrackingService } from '../services/live-tracking.service';
 
 /**
  * MapaPage — Mapa Leaflet (Tab 3)
@@ -46,9 +47,10 @@ import { ViewerService } from '../services/viewer.service';
 })
 export class MapaPage implements AfterViewInit, OnDestroy {
   readonly mapaService    = inject(MapaService);
-  readonly ultimaMilla    = inject(UltimaMillaService); // público — consumido por template (T09-03)
-  readonly autonomia      = inject(AutonomiaService);   // público — alcanzaDestino para template (T04-09)
-  readonly viewer         = inject(ViewerService);      // público — consumido por template (viewer card)
+  readonly ultimaMilla    = inject(UltimaMillaService);
+  readonly autonomia      = inject(AutonomiaService);
+  readonly viewer         = inject(ViewerService);
+  readonly liveTracking   = inject(LiveTrackingService); // público — tarjeta live en template
   private readonly zonas  = inject(ZonasService);
   private readonly genero = inject(GeneroService);
   private readonly superficie   = inject(SuperficieService);
@@ -72,9 +74,16 @@ export class MapaPage implements AfterViewInit, OnDestroy {
     // El tab ya terminó su animación — el contenedor tiene dimensiones reales
     this.mapaService.invalidarTamano();
 
+    const sessionId = this.viewer.liveSessionId();
     const vp = this.viewer.params();
-    if (vp) {
-      // Viewer mode: mostrar posición del rider compartida vía URL — sin GPS nativo
+
+    if (sessionId) {
+      // Viewer live: suscribir a Firebase, actualizar marcador en tiempo real
+      this.liveTracking.suscribirSesion(sessionId, (pos) => {
+        this.mapaService.moverMarcadorViewer(pos.lat, pos.lng);
+      });
+    } else if (vp) {
+      // Viewer snapshot: mostrar posición fija de la URL
       this.mapaService.colocarMarcadorViewer(vp.lat, vp.lng);
     } else {
       // Modo normal: Iniciar GPS para mostrar posición en el mapa.
@@ -95,6 +104,7 @@ export class MapaPage implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.liveTracking.desuscribir();
     this.mapaService.destruirMapa();
     this.capasInicializadas = false;
   }

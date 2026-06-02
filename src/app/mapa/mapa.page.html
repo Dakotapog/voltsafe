@@ -7,11 +7,40 @@
     Aparece cuando la URL tiene ?lat=X&lng=Y (link compartido desde PERFIL).
     TTC: NASA Eyes on Solar System + FedEx tracking — estado en URL → browser.
   -->
+  <!-- Tarjeta viewer LIVE — tracking en tiempo real via Firebase -->
+  @if (viewer.liveSessionId() && liveTracking.posicionViva(); as pos) {
+    <div class="viewer-card">
+      <div class="viewer-header">
+        <span class="viewer-live">⬤ EN VIVO</span>
+        Seguimiento en tiempo real
+      </div>
+      <div class="viewer-stats">
+        <div class="viewer-stat">
+          <span class="viewer-stat-val">{{ pos.bat }}%</span>
+          <span class="viewer-stat-lbl">Batería</span>
+        </div>
+        <div class="viewer-stat">
+          <span class="viewer-stat-val">{{ pos.km | number:'1.1-1' }}</span>
+          <span class="viewer-stat-lbl">km</span>
+        </div>
+        <div class="viewer-stat">
+          <span class="viewer-stat-val">{{ pos.kmh | number:'1.0-0' }}</span>
+          <span class="viewer-stat-lbl">km/h</span>
+        </div>
+        <div class="viewer-stat">
+          <span class="viewer-stat-val" [style.color]="briColor(pos.bri)">{{ pos.bri }}</span>
+          <span class="viewer-stat-lbl">Superficie</span>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Tarjeta viewer SNAPSHOT — posición fija desde URL params -->
   @if (viewer.params(); as vp) {
     <div class="viewer-card">
       <div class="viewer-header">
-        <span class="viewer-live">● EN VIVO</span>
-        Rider compartiendo posición
+        <span class="viewer-live">● Posición compartida</span>
+        Rider — snapshot
       </div>
       <div class="viewer-stats">
         <div class="viewer-stat">

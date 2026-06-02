@@ -504,6 +504,20 @@ export class MapaService {
   }
 
   /**
+   * Mueve el marcador viewer a una nueva posición sin reiniciarlo.
+   * Usado por LiveTrackingService al recibir actualizaciones de Firebase.
+   * No hace setView para que el familiar pueda hacer pan/zoom libremente.
+   */
+  moverMarcadorViewer(lat: number, lng: number): void {
+    if (!this.map) return;
+    if (this.marcadorViewer) {
+      this.marcadorViewer.setLatLng([lat, lng]);
+    } else {
+      this.colocarMarcadorViewer(lat, lng);
+    }
+  }
+
+  /**
    * Elimina el destino activo del mapa y del Signal.
    */
   limpiarDestino(): void {

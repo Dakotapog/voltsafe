@@ -3,15 +3,11 @@ import { Injectable, signal } from '@angular/core';
 /**
  * ViewerService — Modo de visualización compartida.
  *
- * Cuando alguien recibe un link de VoltSafe con parámetros de posición,
- * este servicio los captura y los expone como Signals para que MapaPage
- * muestre el marcador del rider en el mapa de VoltSafe.
+ * Dos modos de viewer:
+ *  1. Snapshot (URL params): ?lat=X&lng=Y&bat=...  → posición fija
+ *  2. Live (session ID):     ?session=vs-123-abc   → tracking en tiempo real
  *
- * URL format: https://voltsafe.netlify.app/?lat=4.6650&lng=-74.0560&bat=78&km=2.31&kmh=18.5&bri=SUAVE
- *
- * TTC: NASA Eyes on the Solar System usa exactamente este patrón —
- * el estado del objeto (posición, velocidad) codificado en la URL →
- * cualquier browser recibe la misma vista. Sin servidor, sin backend.
+ * TTC: NASA Eyes on the Solar System — estado del rider codificado en URL.
  */
 export interface ViewerParams {
   lat: number;
@@ -27,18 +23,35 @@ export interface ViewerParams {
 @Injectable({ providedIn: 'root' })
 export class ViewerService {
 
-  /** null = modo normal de la app · params = modo viewer desde link compartido */
+  /** null = modo normal de la app · params = modo viewer snapshot */
   readonly params = signal<ViewerParams | null>(null);
+
+  /** null = sin live session · string = session ID para Firebase */
+  readonly liveSessionId = signal<string | null>(null);
+
+  /** true si es cualquier tipo de viewer (snapshot o live) */
+  get esViewer(): boolean {
+    return this.params() !== null || this.liveSessionId() !== null;
+  }
 
   /**
    * Lee los parámetros de la URL al arrancar la app.
-   * Si lat/lng están presentes → activa modo viewer.
+   * Detecta tanto snapshot (?lat/lng) como live (?session).
+   * Retorna true si es cualquier modo viewer.
    */
   parsearDesdeURL(): boolean {
     const search = new URLSearchParams(window.location.search);
+
+    // Modo live: ?session=vs-1234-abc
+    const sessionId = search.get('session');
+    if (sessionId && sessionId.startsWith('vs-')) {
+      this.liveSessionId.set(sessionId);
+      return true;
+    }
+
+    // Modo snapshot: ?lat=X&lng=Y
     const lat = parseFloat(search.get('lat') ?? '');
     const lng = parseFloat(search.get('lng') ?? '');
-
     if (isNaN(lat) || isNaN(lng)) return false;
 
     this.params.set({

@@ -295,6 +295,44 @@ ion-title {
   color: #3a7055;
 }
 
+.live-bar {
+  margin: 0 16px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  ion-button[expand="block"] { flex: 1; }
+}
+
+.live-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.live-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ff4444;
+  box-shadow: 0 0 8px #ff4444;
+  animation: live-pulse 1s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes live-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(0.7); }
+}
+
+.live-label {
+  font-size: 0.72rem;
+  color: #ff8888;
+  font-family: monospace;
+  letter-spacing: 0.03em;
+}
+
 // ============================================================
 // BOTÓN PRINCIPAL START/STOP
 // Activo: negro + ring ámbar pulsante (grabando)

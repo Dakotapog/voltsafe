@@ -37,6 +37,7 @@
     "@capacitor/status-bar": "8.0.2",
     "@ionic/angular": "^8.0.0",
     "@ionic/storage-angular": "^4.0.0",
+    "firebase": "^12.14.0",
     "ionicons": "^7.0.0",
     "leaflet": "^1.9.4",
     "leaflet.heat": "^0.2.0",
