@@ -71,6 +71,11 @@ export class LiveTrackingService {
     this.sesionId.set(sesionId);
     this.enBackground = false;
 
+    // Asegurar GPS activo — sin watchPosition corriendo, posicionActual() siempre
+    // es null y el fallback getCurrentPosition() devuelve datos cacheados/estáticos.
+    // geo.iniciar() tiene guard "if (activo) return" — seguro si la sesión ya está viva.
+    await this.geo.iniciar();
+
     // Escuchar cambios de estado de la app para pausar en background
     await App.addListener('appStateChange', ({ isActive }) => {
       this.enBackground = !isActive;
@@ -105,12 +110,12 @@ export class LiveTrackingService {
       accuracy = posSignal.accuracy ?? 15;
     } else {
       try {
-        const raw = await Geolocation.getCurrentPosition({ enableHighAccuracy: true });
+        const raw = await Geolocation.getCurrentPosition({ enableHighAccuracy: true, timeout: 5000 });
         lat      = raw.coords.latitude;
         lng      = raw.coords.longitude;
         accuracy = raw.coords.accuracy ?? 15;
       } catch {
-        return; // sin posición disponible — reintentar en próximo intervalo
+        return; // GPS sin fix aún — reintentar en próximo intervalo (watchPosition llegará pronto)
       }
     }
 
