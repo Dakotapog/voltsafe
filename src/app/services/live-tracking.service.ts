@@ -37,8 +37,10 @@ export class LiveTrackingService {
   private readonly ruta          = inject(RutaService);
   private readonly superficie    = inject(SuperficieService);
 
-  readonly sesionId    = signal<string | null>(null);
+  readonly sesionId     = signal<string | null>(null);
   readonly posicionViva = signal<PosicionViva | null>(null);
+  /** null = conectando · true = rider activo · false = sesión expirada/sin datos */
+  readonly sesionViva   = signal<boolean | null>(null);
 
   private app:      FirebaseApp | null = null;
   private intervalo: ReturnType<typeof setInterval> | null = null;
@@ -134,13 +136,20 @@ export class LiveTrackingService {
   // ============================================================
 
   suscribirSesion(sesionId: string, onChange: (pos: PosicionViva) => void): void {
+    this.sesionViva.set(null); // conectando
     const db = getDatabase(this.getApp());
     this.listenerRef = ref(db, `sessions/${sesionId}/pos`);
     onValue(this.listenerRef, (snapshot) => {
       const datos = snapshot.val() as PosicionViva | null;
       if (datos) {
+        this.sesionViva.set(true);
         this.posicionViva.set(datos);
         onChange(datos);
+      } else {
+        // Solo marcar expirada si nunca recibimos datos en esta suscripción
+        if (this.sesionViva() !== true) {
+          this.sesionViva.set(false);
+        }
       }
     });
   }
@@ -151,5 +160,6 @@ export class LiveTrackingService {
       this.listenerRef = null;
     }
     this.posicionViva.set(null);
+    this.sesionViva.set(null);
   }
 }

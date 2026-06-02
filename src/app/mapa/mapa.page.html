@@ -7,6 +7,20 @@
     Aparece cuando la URL tiene ?lat=X&lng=Y (link compartido desde PERFIL).
     TTC: NASA Eyes on Solar System + FedEx tracking — estado en URL → browser.
   -->
+  <!-- Banner: conectando a sesión live -->
+  @if (viewer.liveSessionId() && liveTracking.sesionViva() === null) {
+    <div class="viewer-status-banner connecting">
+      <span class="banner-dot pulsing">⬤</span> Conectando con el rider…
+    </div>
+  }
+
+  <!-- Banner: sesión live expirada / rider no activo -->
+  @if (viewer.liveSessionId() && liveTracking.sesionViva() === false) {
+    <div class="viewer-status-banner expired">
+      <span class="banner-dot">◯</span> El rider no está compartiendo en este momento
+    </div>
+  }
+
   <!-- Tarjeta viewer LIVE — tracking en tiempo real via Firebase -->
   @if (viewer.liveSessionId() && liveTracking.posicionViva(); as pos) {
     <div class="viewer-card">

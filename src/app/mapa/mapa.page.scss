@@ -44,6 +44,42 @@ ion-toolbar {
 // TTC: NASA telemetry dashboards — estado del objeto codificado en URL
 // ============================================================
 
+// Banners de estado de sesión live (conectando / expirada)
+.viewer-status-banner {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 1001;
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: 0.3px;
+
+  &.connecting {
+    background: rgba(4, 8, 16, 0.9);
+    border: 1px solid rgba(0, 200, 255, 0.35);
+    color: #adb5bd;
+    .banner-dot { color: #00c8ff; }
+  }
+
+  &.expired {
+    background: rgba(20, 10, 10, 0.92);
+    border: 1px solid rgba(255, 107, 107, 0.35);
+    color: #adb5bd;
+    .banner-dot { color: #ff6b6b; }
+  }
+
+  .banner-dot.pulsing {
+    animation: viewer-blink 1.2s step-end infinite;
+  }
+}
+
 .viewer-card {
   position: absolute;
   top: 16px;
