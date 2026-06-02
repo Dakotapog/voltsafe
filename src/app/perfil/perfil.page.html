@@ -1,0 +1,187 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="dark">
+    <ion-title>Perfil</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" color="dark">
+  <ion-header collapse="condense">
+    <ion-toolbar color="dark">
+      <ion-title size="large">Perfil</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <!-- Contacto de emergencia — RF-06 -->
+  <ion-list-header color="dark">
+    <ion-label>Seguridad Familiar</ion-label>
+  </ion-list-header>
+
+  <ion-list>
+    <ion-item color="dark" (click)="editarContacto()" button detail>
+      <ion-icon name="person-circle-outline" slot="start" color="success"></ion-icon>
+      <ion-label>
+        @if (seguridad.contacto()) {
+          <h2>{{ seguridad.contacto()!.nombre }}</h2>
+          <p>{{ seguridad.contacto()!.telefono }}</p>
+        } @else {
+          <h2>Agregar contacto de emergencia</h2>
+          <p>Toca para configurar</p>
+        }
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
+  @if (seguridad.contacto()) {
+    <!--
+      TTC #20 — Semiótica de Peirce: clase .sos-zona-activa transforma
+      los botones de Símbolo en Índice cuando alertaActiva = true.
+      El color y la animación son causalmente conectados al peligro real.
+    -->
+    <div style="padding: 8px 16px;" [class.sos-zona-activa]="zonas.alertaActiva().activa">
+      <ion-button
+        expand="block"
+        [color]="zonas.alertaActiva().activa ? 'danger' : 'success'"
+        (click)="compartirWhatsApp()">
+        <ion-icon name="logo-whatsapp" slot="start"></ion-icon>
+        {{ zonas.alertaActiva().activa ? 'SOS — WhatsApp' : 'Compartir ubicación (WhatsApp)' }}
+      </ion-button>
+
+      <ion-button
+        expand="block"
+        [color]="zonas.alertaActiva().activa ? 'danger' : 'medium'"
+        (click)="compartirSMS()"
+        style="margin-top: 8px;">
+        <ion-icon name="chatbubble-outline" slot="start"></ion-icon>
+        {{ zonas.alertaActiva().activa ? 'SOS — SMS' : 'Compartir ubicación (SMS)' }}
+      </ion-button>
+    </div>
+  }
+
+  <!-- ══════════════════════════════════════════════════════════════
+       RF-10 — Exportación DaaS
+       TTC #15: Biopsia Urbana — el GeoJSON diagnostica la infraestructura
+       TTC #16: Estratificación Temporal — cada export es un estrato inmutable
+       ══════════════════════════════════════════════════════════════ -->
+  <ion-list-header color="dark" style="margin-top: 24px;">
+    <ion-label>Exportar datos (DaaS)</ion-label>
+  </ion-list-header>
+
+  <ion-list>
+    <!-- Toggle consentimiento género -->
+    <ion-item color="dark">
+      <ion-icon name="shield-half-outline" slot="start" color="tertiary"></ion-icon>
+      <ion-label>
+        <h2>Incluir reportes de seguridad género</h2>
+        <p>Solo coordenadas y categoría — sin fecha ni identificador</p>
+      </ion-label>
+      <ion-toggle
+        slot="end"
+        [checked]="incluirGenero()"
+        (ionChange)="incluirGenero.set($any($event).detail.checked)"
+        color="tertiary">
+      </ion-toggle>
+    </ion-item>
+  </ion-list>
+
+  <div style="padding: 8px 16px;">
+    <ion-button
+      expand="block"
+      color="primary"
+      [disabled]="exportSvc.exportando()"
+      (click)="exportarDatos()">
+      <ion-icon
+        [name]="exportSvc.exportando() ? 'hourglass-outline' : 'download-outline'"
+        slot="start">
+      </ion-icon>
+      {{ exportSvc.exportando() ? 'Generando...' : 'Generar reporte GeoJSON' }}
+    </ion-button>
+
+    <!-- Resumen del último export -->
+    @if (ultimoResultado()) {
+      <ion-card style="--background: #1b2a3a; margin-top: 12px;">
+        <ion-card-header>
+          <ion-card-subtitle style="color: #4dabf7;">Último reporte</ion-card-subtitle>
+          <ion-card-title style="color: #fff; font-size: 1rem;">
+            {{ ultimoResultado()!.path }}
+          </ion-card-title>
+        </ion-card-header>
+        <ion-card-content style="color: #aaa; font-size: 0.85rem;">
+          {{ ultimoResultado()!.sesiones }} rutas ·
+          {{ ultimoResultado()!.impactos }} impactos BRI ·
+          {{ ultimoResultado()!.zonas }} zonas peligro
+          @if (ultimoResultado()!.fotosRuta > 0) {
+            · {{ ultimoResultado()!.fotosRuta }} fotos georref.
+          }
+          @if (ultimoResultado()!.reportesGenero > 0) {
+            · {{ ultimoResultado()!.reportesGenero }} reportes género
+          }
+        </ion-card-content>
+      </ion-card>
+
+      <ion-button
+        expand="block"
+        color="medium"
+        style="margin-top: 8px;"
+        (click)="compartirUltimoReporte()">
+        <ion-icon name="share-outline" slot="start"></ion-icon>
+        Compartir reporte
+      </ion-button>
+    }
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       T01-06 — Configuración de rango máximo (RF-01)
+       El rango configurable alimenta a AutonomiaService para que el
+       cálculo de autonomía se ajuste a la batería real de la e-bike.
+       Se persiste en Storage y sobrevive a reinicios de la app.
+       ══════════════════════════════════════════════════════════════ -->
+  <ion-list-header color="dark" style="margin-top: 24px;">
+    <ion-label>Configuración de e-bike</ion-label>
+  </ion-list-header>
+
+  <ion-list>
+    <ion-item color="dark">
+      <ion-icon name="battery-full-outline" slot="start" color="success"></ion-icon>
+      <ion-label>
+        <h2>Rango máximo de batería</h2>
+        <p>{{ autonomia.rangoMaximo_km() }} km (batería completa, terreno plano)</p>
+      </ion-label>
+    </ion-item>
+    <ion-item color="dark">
+      <ion-range
+        min="20"
+        max="80"
+        step="5"
+        [value]="autonomia.rangoMaximo_km()"
+        (ionChange)="guardarRango($event)"
+        color="success"
+        style="padding: 8px 0;">
+        <ion-label slot="start" style="font-size: 0.8rem; color: #868e96;">20 km</ion-label>
+        <ion-label slot="end" style="font-size: 0.8rem; color: #868e96;">80 km</ion-label>
+      </ion-range>
+    </ion-item>
+  </ion-list>
+
+  <!-- Info de la app -->
+  <ion-list-header color="dark" style="margin-top: 24px;">
+    <ion-label>Acerca de</ion-label>
+  </ion-list-header>
+
+  <ion-list>
+    <ion-item color="dark">
+      <ion-icon name="bicycle-outline" slot="start" color="success"></ion-icon>
+      <ion-label>
+        <h2>VoltSafe v0.2.0</h2>
+        <p>Movilidad eléctrica segura para Bogotá</p>
+      </ion-label>
+    </ion-item>
+
+    <ion-item color="dark" button detail (click)="abrirEnme()">
+      <ion-icon name="document-text-outline" slot="start" color="primary"></ion-icon>
+      <ion-label>
+        <h2>ENME — Ley 1964/2019</h2>
+        <p>Estrategia Nacional de Movilidad Eléctrica · Toca para ver</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>

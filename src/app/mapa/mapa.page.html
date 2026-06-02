@@ -1,0 +1,147 @@
+<ion-content [fullscreen]="true" class="mapa-content">
+  <!-- Mapa Leaflet ocupa toda la pantalla -->
+  <div id="mapa"></div>
+
+  <!--
+    VIEWER MODE — Tarjeta de telemetría del rider compartiendo posición.
+    Aparece cuando la URL tiene ?lat=X&lng=Y (link compartido desde PERFIL).
+    TTC: NASA Eyes on Solar System + FedEx tracking — estado en URL → browser.
+  -->
+  @if (viewer.params(); as vp) {
+    <div class="viewer-card">
+      <div class="viewer-header">
+        <span class="viewer-live">● EN VIVO</span>
+        Rider compartiendo posición
+      </div>
+      <div class="viewer-stats">
+        <div class="viewer-stat">
+          <span class="viewer-stat-val">{{ vp.bat }}%</span>
+          <span class="viewer-stat-lbl">Batería</span>
+        </div>
+        <div class="viewer-stat">
+          <span class="viewer-stat-val">{{ vp.km | number:'1.1-1' }}</span>
+          <span class="viewer-stat-lbl">km</span>
+        </div>
+        <div class="viewer-stat">
+          <span class="viewer-stat-val">{{ vp.kmh | number:'1.0-0' }}</span>
+          <span class="viewer-stat-lbl">km/h</span>
+        </div>
+        <div class="viewer-stat">
+          <span class="viewer-stat-val" [style.color]="briColor(vp.bri)">{{ vp.bri }}</span>
+          <span class="viewer-stat-lbl">Superficie</span>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!--
+    T04-07 + T04-09 — Tarjeta de destino activo
+    Aparece al top-izquierda cuando el usuario tapea un punto del mapa.
+    TTC #23 (Autodeterminación, Deci & Ryan): responde "¿Llego?" — la
+    pregunta real del ciclista, no la métrica abstracta de km de batería.
+  -->
+  @if (mapaService.destino()) {
+    <div class="destino-card">
+      <div class="destino-km">
+        📍 {{ (mapaService.distanciaRestante_m()! / 1000) | number:'1.1-1' }} km al destino
+      </div>
+      @if (autonomia.alcanzaDestino() !== null) {
+        <div class="destino-estado"
+             [style.color]="autonomia.alcanzaDestino() ? '#00ff9f' : '#ff6b6b'">
+          {{ autonomia.alcanzaDestino() ? '✓ Autonomía suficiente' : '✗ Autonomía insuficiente' }}
+        </div>
+      }
+      <button class="destino-clear" (click)="mapaService.limpiarDestino()">✕</button>
+    </div>
+  }
+
+  <!-- Controles flotantes sobre el mapa -->
+  <div class="mapa-controles">
+    <!-- Centrar en usuario -->
+    <ion-fab-button size="small" color="dark" (click)="centrar()">
+      <ion-icon name="locate-outline"></ion-icon>
+    </ion-fab-button>
+
+    <!-- Toggle zonas de peligro (rojo) — RF-05 -->
+    <ion-fab-button
+      size="small"
+      [color]="mostrarZonas ? 'danger' : 'medium'"
+      (click)="toggleZonas()">
+      <ion-icon name="warning-outline"></ion-icon>
+    </ion-fab-button>
+
+    <!-- Toggle estaciones TM (azul) — RF-07 -->
+    <ion-fab-button
+      size="small"
+      [color]="mostrarEstaciones ? 'primary' : 'medium'"
+      (click)="toggleEstaciones()">
+      <ion-icon name="bus-outline"></ion-icon>
+    </ion-fab-button>
+
+    <!--
+      Toggle seguridad de género (morado) — RF-08
+      TTC #12: esta capa morada + la roja = epidemiología visual.
+      El ojo humano hace clustering sin algoritmo KDE.
+    -->
+    <ion-fab-button
+      size="small"
+      [color]="mostrarGenero ? 'tertiary' : 'medium'"
+      (click)="toggleGenero()">
+      <ion-icon name="shield-outline"></ion-icon>
+    </ion-fab-button>
+
+    <!--
+      Toggle BRI — impactos de superficie (amarillo/rojo) — RF-03
+      TTC #19: capa de evidencia FORENSE — sensor objetivo, no reportado.
+      Amarillo = MODERADO · Naranja = SEVERO · Rojo = CRITICO
+      Es la única capa que no puede ser fabricada ni sesgada.
+    -->
+    <ion-fab-button
+      size="small"
+      [style.--background]="mostrarBRI ? '#ffd43b' : '#555'"
+      [style.--color]="mostrarBRI ? '#000' : '#fff'"
+      (click)="toggleBRI()">
+      <ion-icon name="pulse-outline"></ion-icon>
+    </ion-fab-button>
+
+    <!--
+      Reportar zona de peligro (naranja) — T06-07 / RF-05 activo.
+      El ciclista puede marcar una zona en su posición GPS actual.
+    -->
+    <ion-fab-button
+      size="small"
+      color="warning"
+      (click)="reportarZona()">
+      <ion-icon name="flag-outline"></ion-icon>
+    </ion-fab-button>
+  </div>
+
+  <!--
+    Panel flotante de estaciones TM — T09-03 (RF-07)
+
+    TTC #22 — Gestalt de Proximidad (Wertheimer, 1923):
+    La lista co-existe espacialmente con los marcadores azules del mapa.
+    La proximidad visual crea agrupación perceptual inmediata sin esfuerzo
+    cognitivo — el ciclista conecta puntos azules ↔ ítems de lista
+    sin instrucciones. Es el mismo principio que usa Google Maps.
+  -->
+  @if (mostrarEstaciones && ultimaMilla.estacionesCercanas().length > 0) {
+    <div class="estaciones-panel">
+      <div class="estaciones-panel-header">
+        <ion-icon name="bus-outline"></ion-icon>
+        Estaciones TM cercanas
+      </div>
+      @for (est of ultimaMilla.estacionesCercanas(); track est.id) {
+        <div class="estacion-item">
+          <span class="estacion-nombre">{{ est.nombre }}</span>
+          <span class="estacion-meta">
+            {{ est.distancia_m | number:'1.0-0' }} m
+            @if (est.tiene_bicicletero) {
+              <ion-icon name="bicycle-outline" style="color: #00ff9f; margin-left: 4px;"></ion-icon>
+            }
+          </span>
+        </div>
+      }
+    </div>
+  }
+</ion-content>

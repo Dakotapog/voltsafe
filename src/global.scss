@@ -35,3 +35,33 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import "@ionic/angular/css/palettes/dark.system.css";
+
+// ── Viewer mode — marcador pulsante del rider compartido ──────────────────────
+// CSS global porque Leaflet divIcon renderiza fuera del shadow DOM de Angular.
+// TTC: NASA Eyes on Solar System + FedEx tracking.
+
+@keyframes viewer-pulse {
+  0%   { transform: scale(0.4); opacity: 0.85; }
+  100% { transform: scale(2.8); opacity: 0; }
+}
+
+.viewer-pulse-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 3px solid #00c8ff;
+  animation: viewer-pulse 1.8s ease-out infinite;
+}
+
+.viewer-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 14px;
+  height: 14px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: #00c8ff;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 8px #00c8ff, 0 0 18px rgba(0, 200, 255, 0.5);
+}

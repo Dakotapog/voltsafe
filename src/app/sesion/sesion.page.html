@@ -1,0 +1,280 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      <ion-icon name="flash" style="color:#0090e0; margin-right:6px; vertical-align:middle;"></ion-icon>
+      Sesión
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large" style="color:#00c8ff;">Sesión</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <!-- Banner alerta zona peligro — RF-05 -->
+  @if (zonas.alertaActiva().activa) {
+    <div class="zona-peligro-banner">
+      <ion-icon name="warning-outline" style="color:#ff4444; font-size:1.3rem;"></ion-icon>
+      <div>
+        <div style="color:#ff4444; font-weight:700; font-size:0.85rem;">ZONA DE PELIGRO</div>
+        <div style="color:#ff8888; font-size:0.75rem;">
+          {{ zonas.alertaActiva().zona }} — {{ zonas.alertaActiva().distancia_m }}m
+        </div>
+      </div>
+    </div>
+  }
+
+  <!--
+    ══════════════════════════════════════════════════════════════
+    DISPLAY PRINCIPAL DE VELOCIDAD — TTC #29 (F1 McLaren HUD)
+    La velocidad instantánea es el dato primario del cockpit.
+    En un Fórmula E ocupa el 60% del display central del volante.
+    El glow azul plasma replica el visor del piloto bajo luz solar.
+    ══════════════════════════════════════════════════════════════
+  -->
+  <div class="speed-block">
+
+    <!-- Punto de confianza GPS — top right (TTC #8 Confidence Ring) -->
+    <div class="gps-dot"
+         [class.gps-alta]="geo.nivelConfianza() === NivelConfianza.ALTA"
+         [class.gps-media]="geo.nivelConfianza() === NivelConfianza.MEDIA"
+         [class.gps-baja]="geo.nivelConfianza() === NivelConfianza.BAJA"
+         [class.gps-descarte]="geo.nivelConfianza() === NivelConfianza.DESCARTE">
+    </div>
+
+    <span class="speed-value"
+          [class.speed-moving]="(geo.velocidadMS() * 3.6) > 2">
+      {{ (geo.velocidadMS() * 3.6) | number:'1.1-1' }}
+    </span>
+    <span class="speed-unit">km / h</span>
+  </div>
+
+  <!--
+    ══════════════════════════════════════════════════════════════
+    CLUSTER DE INSTRUMENTOS — distancia y duración flanquean el HUD
+    TTC #29: sector times laterales del volante F1 / McLaren
+    ══════════════════════════════════════════════════════════════
+  -->
+  <!--
+    ══════════════════════════════════════════════════════════════
+    ERS — Energy Recovery System (TTC Formula E / McLaren F1)
+    La barra de energía es el dato más crítico del cockpit eléctrico.
+    Verde → ámbar → rojo pulsante bajo 20% (attack mode threshold).
+    ══════════════════════════════════════════════════════════════
+  -->
+  <div class="ers-container">
+    <span class="ers-tag">ERS</span>
+    <div class="ers-track">
+      <div class="ers-fill"
+           [style.width]="deviceMonitor.nivelBateria() + '%'"
+           [class.ers-ok]="deviceMonitor.nivelBateria() >= 40"
+           [class.ers-warn]="deviceMonitor.nivelBateria() >= 20 && deviceMonitor.nivelBateria() < 40"
+           [class.ers-crit]="deviceMonitor.nivelBateria() < 20">
+      </div>
+    </div>
+    <span class="ers-pct"
+          [class.ers-pct-crit]="deviceMonitor.nivelBateria() < 20">
+      {{ deviceMonitor.nivelBateria() }}%
+    </span>
+  </div>
+
+  <!--
+    ══════════════════════════════════════════════════════════════
+    CLUSTER DE INSTRUMENTOS — 3 sectores (TTC #29 + TTC #31)
+    F1: velocidad central + sector times laterales
+    VoltSafe: speed + distancia + pace min/km
+    ══════════════════════════════════════════════════════════════
+  -->
+  <div class="instruments-cluster">
+    <div class="instrument-card">
+      <span class="instrument-value">
+        {{ ruta.distanciaAcumulada_km() | number:'1.2-2' }}
+      </span>
+      <span class="instrument-label">km recorridos</span>
+    </div>
+    <div class="instrument-card">
+      <span class="instrument-value">
+        {{ formatearDuracion(ruta.duracion_s()) }}
+      </span>
+      <span class="instrument-label">duración</span>
+    </div>
+    <div class="instrument-card">
+      <span class="instrument-value">{{ getPace() }}</span>
+      <span class="instrument-label">min / km</span>
+    </div>
+  </div>
+
+  <!--
+    ══════════════════════════════════════════════════════════════
+    SISMÓGRAFO BRI — V7 (TTC #17 Red Sismográfica USGS)
+    Visible durante sesión con acelerómetro activo.
+    La onda azul plasma visualiza la señal filtrada del pavimento.
+    Pico = bache. Amplitud = severidad BRI.
+    ══════════════════════════════════════════════════════════════
+  -->
+  <!--
+    ══════════════════════════════════════════════════════════════
+    SISMÓGRAFO BRI — siempre visible (TTC Holter Cardiaco)
+    Modo standby: flatline — "corazón en reposo"
+    Modo activo: onda BRI en tiempo real — "latido del pavimento"
+    TTC #32: Holter monitor (cardiología) → sismógrafo pavimento.
+    El monitor Holter registra 24h de actividad cardíaca:
+    flatline hasta que el corazón comienza a latir.
+    VoltSafe replica esa transición: el pavimento "late" cuando
+    el usuario rueda sobre él.
+    ══════════════════════════════════════════════════════════════
+  -->
+  <app-bri-seismograph></app-bri-seismograph>
+
+  <!--
+    ══════════════════════════════════════════════════════════════
+    EXTERNALIDADES EN VIVO — strip compacto (RF-09)
+    TTC #29: indicadores laterales de eficiencia del vehículo
+    Solo durante sesión activa — datos del viaje actual
+    ══════════════════════════════════════════════════════════════
+  -->
+  @if (ruta.sesionActiva()) {
+    <div class="ext-live-strip">
+      <div class="ext-chip">
+        <span class="ext-chip-value" style="color:#00ff9f;">
+          {{ externalidades.externalidadesSesion().co2_g }}g
+        </span>
+        <span class="ext-chip-label">CO₂ evitado</span>
+      </div>
+      <div class="ext-chip">
+        <span class="ext-chip-value" style="color:#00c8ff;">
+          ${{ externalidades.externalidadesSesion().dinero_cop }}
+        </span>
+        <span class="ext-chip-label">COP ahorrado</span>
+      </div>
+      <div class="ext-chip">
+        <span class="ext-chip-value" style="color:#f783ac;">
+          {{ externalidades.externalidadesSesion().calorias }}
+        </span>
+        <span class="ext-chip-label">kcal</span>
+      </div>
+    </div>
+
+    <!-- Dead Man's Switch + Compartir ubicación — RF-06 -->
+    <div class="dms-bar">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <ion-icon name="shield-checkmark-outline" style="color:#00ff9f; font-size:1rem;"></ion-icon>
+        <span class="dms-text">Check-in · 30 min</span>
+      </div>
+      <div style="display:flex; gap:6px;">
+        <!-- Compartir con contacto de emergencia vía WhatsApp -->
+        <ion-button size="small" color="primary" (click)="compartirUbicacion()"
+                    title="WhatsApp contacto">
+          <ion-icon name="logo-whatsapp" slot="icon-only"></ion-icon>
+        </ion-button>
+        <!-- Compartir con cualquier app/contacto — selector nativo Android -->
+        <ion-button size="small" color="medium" (click)="compartirConCualquiera()"
+                    title="Compartir con...">
+          <ion-icon name="share-social-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+        <ion-button size="small" color="success" (click)="confirmarLlegada()">
+          Llegué
+        </ion-button>
+      </div>
+    </div>
+  }
+
+  <!--
+    ══════════════════════════════════════════════════════════════
+    BOTÓN PRINCIPAL — START / STOP
+    Inactivo: azul eléctrico profundo — "listo para encender"
+    Activo: ámbar pulsante — "grabando telemetría"
+    TTC #29: botón de ignición del vehículo eléctrico
+    ══════════════════════════════════════════════════════════════
+  -->
+  <div class="action-button-container">
+    <ion-button
+      expand="block"
+      [class.btn-activo]="ruta.sesionActiva()"
+      [class.btn-iniciando]="!ruta.sesionActiva()"
+      class="action-button"
+      (click)="toggleSesion()">
+      <ion-icon
+        [name]="ruta.sesionActiva() ? 'stop-circle-outline' : 'flash-outline'"
+        slot="start">
+      </ion-icon>
+      {{ ruta.sesionActiva() ? 'DETENER SESIÓN' : 'INICIAR RUTA' }}
+    </ion-button>
+  </div>
+
+  <!--
+    RESUMEN POST-SESIÓN — TTC #23 (Autodeterminación, Deci & Ryan 1985)
+    Aparece al terminar si km > 0.01. Cierra el loop motivacional:
+    esfuerzo → logro percibido → adherencia a la movilidad eléctrica.
+  -->
+  @if (!ruta.sesionActiva() && resumenSesion()) {
+    <ion-card class="resumen-card">
+      <ion-card-header>
+        <ion-card-subtitle style="color:#0090e0;">
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+          Ruta completada
+        </ion-card-subtitle>
+        <ion-card-title style="color:#00c8ff; font-size:1.8rem; font-family:monospace;">
+          {{ resumenSesion()!.km | number:'1.2-2' }} km
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-grid style="padding:0;">
+          <ion-row>
+            <ion-col size="4" class="ion-text-center">
+              <div class="resumen-valor" style="color:#00c8ff;">
+                {{ formatearDuracion(resumenSesion()!.duracion_s) }}
+              </div>
+              <div class="resumen-etiqueta">duración</div>
+            </ion-col>
+            <ion-col size="4" class="ion-text-center">
+              <div class="resumen-valor" style="color:#00ff9f;">
+                {{ resumenSesion()!.co2_g | number:'1.0-0' }}g
+              </div>
+              <div class="resumen-etiqueta">CO₂ evitado</div>
+            </ion-col>
+            <ion-col size="4" class="ion-text-center">
+              <div class="resumen-valor" style="color:#ffd43b;">
+                {{ resumenSesion()!.cal | number:'1.0-0' }}
+              </div>
+              <div class="resumen-etiqueta">kcal</div>
+            </ion-col>
+          </ion-row>
+          <ion-row style="margin-top:8px;">
+            <ion-col class="ion-text-center">
+              <div style="font-size:0.78rem; color:#2d4a6a;">
+                Ahorro: ${{ resumenSesion()!.ahorro_cop | number:'1.0-0' }} COP vs. carro particular
+              </div>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-card-content>
+    </ion-card>
+  }
+
+</ion-content>
+
+<!--
+  FABs fijos — visibles durante sesión activa
+-->
+@if (ruta.sesionActiva()) {
+  <!-- FAB morado — Denuncia Rápida RF-08 (TTC #10 Bystander invertido) -->
+  <ion-fab vertical="bottom" horizontal="start" slot="fixed">
+    <ion-fab-button
+      color="tertiary"
+      (click)="abrirDenunciaRapida()"
+      [class.fab-pulsante]="zonas.alertaActiva().activa">
+      <ion-icon name="shield-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+  <!-- FAB ámbar — Cámara georreferenciada (T02-07 / RF-02) -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button color="warning" (click)="tomarFoto()">
+      <ion-icon name="camera-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+}

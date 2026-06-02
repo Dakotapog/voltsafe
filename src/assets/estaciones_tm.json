@@ -1,0 +1,291 @@
+{
+  "_metadata": {
+    "fuente": "TransMilenio S.A. — mapa oficial de estaciones y portales",
+    "fecha_curacion": "2026-05-28",
+    "metodo": "Coordenadas cruzadas con OpenStreetMap y Google Maps. Campo tiene_bicicletero basado en reportes de usuarios y fotos de portales verificados en 2024-2025.",
+    "nota_precision": "Coordenadas con precisión de ~50m. Suficiente para Haversine a 500m. Verificar en campo antes de E3.",
+    "total_estaciones": 25,
+    "paleta_mapa": {
+      "color_marcador": "#2196F3",
+      "color_bicicletero": "#00E676",
+      "icono": "bus"
+    }
+  },
+  "estaciones": [
+    {
+      "id": "TM-P01",
+      "nombre": "Portal Norte",
+      "tipo": "portal",
+      "lat": 4.7582,
+      "lng": -74.0455,
+      "tiene_bicicletero": true,
+      "riesgo_estacionamiento": "bajo",
+      "lineas": ["B"],
+      "notas": "Bicicletero cubierto con capacidad ~200. Acceso por ciclorruta Autopista Norte."
+    },
+    {
+      "id": "TM-P02",
+      "nombre": "Portal 80",
+      "tipo": "portal",
+      "lat": 4.6889,
+      "lng": -74.1105,
+      "tiene_bicicletero": true,
+      "riesgo_estacionamiento": "bajo",
+      "lineas": ["A"],
+      "notas": "Bicicletero operativo. Approach desde Av. 68 con ciclorruta directa."
+    },
+    {
+      "id": "TM-P03",
+      "nombre": "Portal Américas",
+      "tipo": "portal",
+      "lat": 4.6264,
+      "lng": -74.1572,
+      "tiene_bicicletero": true,
+      "riesgo_estacionamiento": "bajo",
+      "lineas": ["F"],
+      "notas": "Bicicletero funcional. Zona de alto tráfico vehicular en approach."
+    },
+    {
+      "id": "TM-P04",
+      "nombre": "Portal El Dorado",
+      "tipo": "portal",
+      "lat": 4.6612,
+      "lng": -74.1267,
+      "tiene_bicicletero": true,
+      "riesgo_estacionamiento": "bajo",
+      "lineas": ["K"],
+      "notas": "Bicicletero cubierto. Ciclorruta Calle 26 conecta directamente."
+    },
+    {
+      "id": "TM-P05",
+      "nombre": "Portal Suba",
+      "tipo": "portal",
+      "lat": 4.7402,
+      "lng": -74.0937,
+      "tiene_bicicletero": true,
+      "riesgo_estacionamiento": "bajo",
+      "lineas": ["C"],
+      "notas": "Bicicletero disponible. Approach por Av. Suba con ciclorruta."
+    },
+    {
+      "id": "TM-P06",
+      "nombre": "Portal Tunal",
+      "tipo": "portal",
+      "lat": 4.5712,
+      "lng": -74.1308,
+      "tiene_bicicletero": true,
+      "riesgo_estacionamiento": "bajo",
+      "lineas": ["E"],
+      "notas": "Bicicletero operativo. Ciclorruta NQS sur llega directamente."
+    },
+    {
+      "id": "TM-P07",
+      "nombre": "Portal 20 de Julio",
+      "tipo": "portal",
+      "lat": 4.5700,
+      "lng": -74.0870,
+      "tiene_bicicletero": false,
+      "riesgo_estacionamiento": "alto",
+      "lineas": ["L"],
+      "notas": "Sin bicicletero. Zona de alta afluencia peatonal. Riesgo de hurto de e-bike."
+    },
+    {
+      "id": "TM-P08",
+      "nombre": "Portal Usme",
+      "tipo": "portal",
+      "lat": 4.4957,
+      "lng": -74.1127,
+      "tiene_bicicletero": false,
+      "riesgo_estacionamiento": "alto",
+      "lineas": ["L"],
+      "notas": "Sin bicicletero. Approach sin ciclorruta segregada — zona de alto riesgo vial."
+    },
+    {
+      "id": "TM-P09",
+      "nombre": "Portal Sur",
+      "tipo": "portal",
+      "lat": 4.5960,
+      "lng": -74.1370,
+      "tiene_bicicletero": false,
+      "riesgo_estacionamiento": "alto",
+      "lineas": ["E"],
+      "notas": "Sin bicicletero confirmado. Iluminación deficiente en accesos nocturnos."
+    },
+    {
+      "id": "TM-E01",
+      "nombre": "Calle 100",
+      "tipo": "estacion",
+      "lat": 4.6901,
+      "lng": -74.0523,
+      "tiene_bicicletero": false,
+      "riesgo_estacionamiento": "medio",
+      "lineas": ["B"],
+      "notas": "Estación troncal Autopista Norte. Sin parqueadero de bicicletas."
+    },
+    {
+      "id": "TM-E02",
+      "nombre": "Calle 72",
+      "tipo": "estacion",
+      "lat": 4.6649,
+      "lng": -74.0551,
+      "tiene_bicicletero": false,
+      "riesgo_estacionamiento": "medio",
+      "lineas": ["B"],
+      "notas": "Zona comercial activa — 'ojos en la calle' durante el día."
+    },
+    {
+      "id": "TM-E03",
+      "nombre": "Héroes",
+      "tipo": "estacion",
+      "lat": 4.6319,
+      "lng": -74.0648,
+      "tiene_bicicletero": false,
+      "riesgo_estacionamiento": "medio",
+      "lineas": ["B"],
+      "notas": "Intersección con ciclorruta Calle 26. Alta visibilidad diurna."
+    },
+    {
+      "id": "TM-E04",
+      "nombre": "Calle 45",
+      "tipo": "estacion",
+      "lat": 4.6408,
+      "lng": -74.0625,
+      "tiene_bicicletero": false,
+      "riesgo_estacionamiento": "medio",
+      "lineas": ["B"],
+      "notas": "Sector universitario — flujo peatonal alto."
+    },
+    {
+      "id": "TM-E05",
+      "nombre": "Calle 57",
+      "tipo": "estacion",
+      "lat": 4.6518,
+      "lng": -74.0589,
+      "tiene_bicicletero": false,
+      "riesgo_estacionamiento": "medio",
+      "lineas": ["B"],
+      "notas": "Cerca de Politécnico Grancolombiano. Referencia para ruta de demo."
+    },
+    {
+      "id": "TM-E06",
+      "nombre": "Av. Jiménez",
+      "tipo": "estacion",
+      "lat": 4.5990,
+      "lng": -74.0761,
+      "tiene_bicicletero": false,
+      "riesgo_estacionamiento": "alto",
+      "lineas": ["B", "L"],
+      "notas": "Centro histórico. Alta congestión. Riesgo de hurto elevado."
+    },
+    {
+      "id": "TM-E07",
+      "nombre": "Museo del Oro",
+      "tipo": "estacion",
+      "lat": 4.6013,
+      "lng": -74.0753,
+      "tiene_bicicletero": false,
+      "riesgo_estacionamiento": "alto",
+      "lineas": ["B"],
+      "notas": "Centro. Sin infraestructura ciclista dedicada en approach."
+    },
+    {
+      "id": "TM-E08",
+      "nombre": "Ricaurte",
+      "tipo": "estacion",
+      "lat": 4.6130,
+      "lng": -74.0912,
+      "tiene_bicicletero": false,
+      "riesgo_estacionamiento": "medio",
+      "lineas": ["E", "K"],
+      "notas": "Nodo de transferencia NQS-Calle 13. Ciclorruta NQS cercana."
+    },
+    {
+      "id": "TM-E09",
+      "nombre": "NQS Calle 30 Sur",
+      "tipo": "estacion",
+      "lat": 4.5910,
+      "lng": -74.0830,
+      "tiene_bicicletero": false,
+      "riesgo_estacionamiento": "medio",
+      "lineas": ["E"],
+      "notas": "Troncal NQS sur. Ciclorruta NQS pasa directamente."
+    },
+    {
+      "id": "TM-E10",
+      "nombre": "Calle 26 — Gobernación",
+      "tipo": "estacion",
+      "lat": 4.6310,
+      "lng": -74.0850,
+      "tiene_bicicletero": false,
+      "riesgo_estacionamiento": "medio",
+      "lineas": ["K"],
+      "notas": "Intersección NQS con Calle 26. Dos ciclorrutas convergen."
+    },
+    {
+      "id": "TM-E11",
+      "nombre": "Salitre El Greco",
+      "tipo": "estacion",
+      "lat": 4.6600,
+      "lng": -74.1050,
+      "tiene_bicicletero": false,
+      "riesgo_estacionamiento": "medio",
+      "lineas": ["K"],
+      "notas": "Sector Salitre. Ciclorruta Calle 26 a 200m."
+    },
+    {
+      "id": "TM-E12",
+      "nombre": "Universidades",
+      "tipo": "estacion",
+      "lat": 4.6364,
+      "lng": -74.0835,
+      "tiene_bicicletero": false,
+      "riesgo_estacionamiento": "bajo",
+      "lineas": ["E"],
+      "notas": "Zona universitaria Nacional/Javeriana. Alto flujo peatonal diurno."
+    },
+    {
+      "id": "TM-E13",
+      "nombre": "Calle 127",
+      "tipo": "estacion",
+      "lat": 4.7160,
+      "lng": -74.0530,
+      "tiene_bicicletero": false,
+      "riesgo_estacionamiento": "medio",
+      "lineas": ["B"],
+      "notas": "Zona empresarial norte. Ciclorruta Autopista Norte a 100m."
+    },
+    {
+      "id": "TM-E14",
+      "nombre": "Calle 146",
+      "tipo": "estacion",
+      "lat": 4.7320,
+      "lng": -74.0485,
+      "tiene_bicicletero": false,
+      "riesgo_estacionamiento": "medio",
+      "lineas": ["B"],
+      "notas": "Sector Cedritos. Approach residencial con iluminación aceptable."
+    },
+    {
+      "id": "TM-E15",
+      "nombre": "Alcalá",
+      "tipo": "estacion",
+      "lat": 4.7450,
+      "lng": -74.0465,
+      "tiene_bicicletero": false,
+      "riesgo_estacionamiento": "medio",
+      "lineas": ["B"],
+      "notas": "Sector Alcalá/Mazurén. Approach largo desde ciclorruta Autopista Norte."
+    },
+    {
+      "id": "TM-E16",
+      "nombre": "Av. 68 con Calle 26",
+      "tipo": "estacion",
+      "lat": 4.6560,
+      "lng": -74.1170,
+      "tiene_bicicletero": false,
+      "riesgo_estacionamiento": "alto",
+      "lineas": ["K"],
+      "notas": "Intersección compleja. Alto riesgo vial para ciclistas en approach."
+    }
+  ]
+}

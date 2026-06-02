@@ -1,0 +1,172 @@
+<ion-header>
+  <ion-toolbar color="dark">
+    <ion-title>ENME — Ley 1964/2019</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrar()" color="medium">Cerrar</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" color="dark">
+
+  <!-- ══════════════════════════════════════════════════════════════
+       T19-01 — Card 1: ¿Qué es la ENME?
+       ══════════════════════════════════════════════════════════════ -->
+  <ion-card style="--background: #1b3a2d; border-left: 4px solid #00ff9f; margin-top: 16px;">
+    <ion-card-header>
+      <ion-card-subtitle style="color: #00ff9f;">
+        <ion-icon name="leaf-outline"></ion-icon>
+        Estrategia Nacional de Movilidad Eléctrica
+      </ion-card-subtitle>
+      <ion-card-title style="color: #ffffff; font-size: 1.1rem;">
+        ¿Qué es la ENME?
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content style="color: #aaa; line-height: 1.6;">
+      <p>
+        La <strong style="color: #e9ecef;">Ley 1964 de 2019</strong> establece la
+        Estrategia Nacional de Movilidad Eléctrica con el objetivo de introducir
+        <strong style="color: #00ff9f;">600.000 vehículos eléctricos</strong>
+        en Colombia para el año 2030.
+      </p>
+      <p style="margin-top: 8px;">
+        Se alinea con los <strong style="color: #e9ecef;">ODS 7</strong>
+        (Energía asequible y no contaminante) y
+        <strong style="color: #e9ecef;">ODS 11</strong>
+        (Ciudades y comunidades sostenibles) de la Agenda 2030 de la ONU.
+      </p>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       T19-04 — Card 2: Marco Legal y Beneficios e-bike
+       ══════════════════════════════════════════════════════════════ -->
+  <ion-card style="--background: #1b2a3a; border-left: 4px solid #4dabf7;">
+    <ion-card-header>
+      <ion-card-subtitle style="color: #4dabf7;">
+        <ion-icon name="document-text-outline"></ion-icon>
+        Marco Legal — Beneficios para bicicletas eléctricas
+      </ion-card-subtitle>
+      <ion-card-title style="color: #ffffff; font-size: 1rem;">
+        Ley 1964/2019 — Incentivos
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list style="background: transparent;">
+        <ion-item lines="none" style="--background: transparent;">
+          <ion-icon name="checkmark-circle-outline" slot="start" color="success"></ion-icon>
+          <ion-label style="white-space: normal;">
+            <h3 style="color: #e9ecef;">Exención de IVA</h3>
+            <p style="color: #aaa;">En la importación de bicicletas y triciclos eléctricos</p>
+          </ion-label>
+        </ion-item>
+        <ion-item lines="none" style="--background: transparent;">
+          <ion-icon name="checkmark-circle-outline" slot="start" color="success"></ion-icon>
+          <ion-label style="white-space: normal;">
+            <h3 style="color: #e9ecef;">Exención SOAT</h3>
+            <p style="color: #aaa;">Bicicletas eléctricas de hasta 1.500 W están exentas</p>
+          </ion-label>
+        </ion-item>
+        <ion-item lines="none" style="--background: transparent;">
+          <ion-icon name="checkmark-circle-outline" slot="start" color="success"></ion-icon>
+          <ion-label style="white-space: normal;">
+            <h3 style="color: #e9ecef;">Sin pico y placa</h3>
+            <p style="color: #aaa;">Las e-bikes están exentas de la restricción vehicular</p>
+          </ion-label>
+        </ion-item>
+        <ion-item lines="none" style="--background: transparent;">
+          <ion-icon name="checkmark-circle-outline" slot="start" color="success"></ion-icon>
+          <ion-label style="white-space: normal;">
+            <h3 style="color: #e9ecef;">Reducción impuesto rodamiento</h3>
+            <p style="color: #aaa;">1% para e-bikes vs 3-5% para vehículos de combustión</p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       T19-01 — Card 3: Impacto ambiental cifras clave
+       ══════════════════════════════════════════════════════════════ -->
+  <ion-card style="--background: #2a1b2d; border-left: 4px solid #b197fc;">
+    <ion-card-header>
+      <ion-card-subtitle style="color: #b197fc;">
+        <ion-icon name="analytics-outline"></ion-icon>
+        Impacto ambiental — Cifras Colombia (IDEAM / ITDP)
+      </ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content style="color: #aaa; line-height: 1.6;">
+      <p>
+        🚲 <strong style="color: #e9ecef;">170 g CO₂</strong> evitados por km
+        vs. carro particular en Bogotá
+      </p>
+      <p style="margin-top: 6px;">
+        🏙️ Desplazamiento promedio Bogotá:
+        <strong style="color: #ffd43b;">1.700 g CO₂/día</strong> por persona
+      </p>
+      <p style="margin-top: 6px;">
+        🌳 1 árbol absorbe
+        <strong style="color: #00ff9f;">22 kg CO₂/año</strong> (IDEAM Colombia)
+      </p>
+      <p style="margin-top: 6px;">
+        ❤️ 30 min/día en bici urbana:
+        <strong style="color: #f783ac;">–14% riesgo cardiovascular</strong>
+        (OMS, 2020)
+      </p>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       T19-02 + T19-03 — Card 4 (dinámica): Tu aporte personal
+       TTC #23 — Autodeterminación: motivación integrada, no externa
+       ══════════════════════════════════════════════════════════════ -->
+  <ion-card style="--background: #1a1a2e; border-left: 4px solid #ffd43b; margin-bottom: 24px;">
+    <ion-card-header>
+      <ion-card-subtitle style="color: #ffd43b;">
+        <ion-icon name="trophy-outline"></ion-icon>
+        Tu aporte personal con VoltSafe
+      </ion-card-subtitle>
+      <ion-card-title style="color: #ffffff; font-size: 1rem;">
+        {{ externalidades.acumuladoHistorico().co2_g | number:'1.0-0' }} g CO₂ evitados
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <!-- Progress bar hacia el primer árbol equivalente -->
+      <p style="color: #aaa; font-size: 0.82rem; margin-bottom: 8px;">
+        Progreso hacia 1 árbol equivalente (22.000 g CO₂)
+      </p>
+      <ion-progress-bar
+        [value]="progresoArbol"
+        color="success"
+        style="height: 10px; border-radius: 5px;">
+      </ion-progress-bar>
+      <p style="color: #868e96; font-size: 0.78rem; margin-top: 6px; text-align: right;">
+        {{ externalidades.arbolesEquivalentes() | number:'1.3-3' }} árboles
+      </p>
+
+      <ion-grid style="margin-top: 12px;">
+        <ion-row>
+          <ion-col size="4" class="ion-text-center">
+            <div style="font-size: 1.1rem; font-weight: 700; color: #4dabf7;">
+              ${{ externalidades.acumuladoHistorico().dinero_cop | number:'1.0-0' }}
+            </div>
+            <div style="font-size: 0.72rem; color: #868e96;">COP ahorrados</div>
+          </ion-col>
+          <ion-col size="4" class="ion-text-center">
+            <div style="font-size: 1.1rem; font-weight: 700; color: #f783ac;">
+              {{ externalidades.acumuladoHistorico().calorias | number:'1.0-0' }}
+            </div>
+            <div style="font-size: 0.72rem; color: #868e96;">kcal quemadas</div>
+          </ion-col>
+          <ion-col size="4" class="ion-text-center">
+            <div style="font-size: 1.1rem; font-weight: 700; color: #ffd43b;">
+              {{ (externalidades.acumuladoHistorico().co2_g / 1700) | number:'1.1-1' }}
+            </div>
+            <div style="font-size: 0.72rem; color: #868e96;">días ENME</div>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-card-content>
+  </ion-card>
+
+</ion-content>

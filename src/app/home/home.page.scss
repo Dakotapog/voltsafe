@@ -1,0 +1,121 @@
+// ============================================================
+// HOME PAGE — Identidad visual: Autonomía + Energía Eléctrica
+// Color base: #00ff9f (verde eléctrico)
+// Aplica tanto a ciclas eléctricas como a patinetas eléctricas
+// ============================================================
+
+ion-content {
+  --background: linear-gradient(160deg, #0d1117 0%, #071a10 60%, #0a2016 100%);
+}
+
+ion-toolbar {
+  --background: rgba(13, 17, 23, 0.97);
+  --border-color: rgba(0, 255, 159, 0.15);
+}
+
+:host {
+  ion-card {
+    --background: rgba(20, 30, 24, 0.92);
+    border-radius: 14px;
+    margin: 12px 16px;
+    border: 1px solid rgba(0, 255, 159, 0.12);
+    backdrop-filter: blur(8px);
+  }
+}
+
+// ============================================================
+// Tarjeta plan de escape (NO_RECOMENDADO + TTC #14)
+// ============================================================
+
+.escape-card {
+  --background: rgba(14, 24, 40, 0.9);
+  border: 1px solid rgba(77, 171, 247, 0.3);
+  border-radius: 14px;
+  margin: 4px 16px 8px;
+}
+
+.calc-card {
+  --background: rgba(18, 22, 30, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 14px;
+  margin: 4px 16px 8px;
+}
+
+// ============================================================
+// Grid de externalidades — 3 columnas compactas
+// ============================================================
+
+.ext-header {
+  font-size: 0.72rem;
+  color: #4a5568;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 8px 20px 4px;
+}
+
+.ext-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  padding: 0 16px 24px;
+}
+
+.ext-card {
+  background: rgba(18, 22, 30, 0.85);
+  border-radius: 12px;
+  padding: 12px 8px;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.ext-card.ext-co2  { border-top: 2px solid #00ff9f; }
+.ext-card.ext-cop  { border-top: 2px solid #4dabf7; }
+.ext-card.ext-kcal { border-top: 2px solid #f783ac; }
+
+.ext-valor {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #e9ecef;
+  line-height: 1.2;
+}
+
+.ext-unidad {
+  font-size: 0.65rem;
+  color: #52637a;
+  margin-top: 2px;
+}
+
+.ext-desc {
+  font-size: 0.62rem;
+  color: #3d4a5c;
+  margin-top: 1px;
+}
+
+// Valores clave de autonomía — visibilidad máxima
+.autonomia-valor {
+  color: #00ff9f;
+  text-shadow: 0 0 16px rgba(0, 255, 159, 0.35);
+  font-size: 3rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.autonomia-label {
+  color: #52c48a;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+}
+
+// Estado semafórico — coherente para ambos vehículos eléctricos
+.estado-SEGURO       { color: #00ff9f; }
+.estado-PRECAUCION   { color: #ffd43b; }
+.estado-NO_RECOMENDADO { color: #ff6b6b; animation: alerta-pulso 1.5s ease-in-out infinite; }
+
+@keyframes alerta-pulso {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.55; }
+}
+
+// Cards de métricas secundarias
+ion-card-title { color: #e9ecef; }
+ion-card-subtitle { color: #52c48a; font-size: 0.78rem; }

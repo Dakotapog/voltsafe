@@ -1,0 +1,375 @@
+// ============================================================
+// SESIÓN PAGE — Cockpit de Telemetría Eléctrica
+//
+// TTC #29 (F1 McLaren → VoltSafe Cockpit):
+//   Los datos de sesión (velocidad GPS, G-forces BRI, batería, tiempo)
+//   son idénticos a los de un monoplaza de Fórmula E. El lenguaje visual
+//   de instrumentación de alto rendimiento: OLED negro puro + plasma
+//   eléctrico azul = máxima legibilidad ambiental + mínima fatiga visual.
+//
+// Sistema de colores:
+//   --vs-bg:          #040810   — negro OLED con undertone azul (profundidad)
+//   --vs-blue:        #0090e0   — azul eléctrico primario (acento principal)
+//   --vs-bright:      #00c8ff   — azul plasma brillante (valores activos)
+//   --vs-deep:        rgba(0,50,120,0.15)  — fondo de tarjeta (profundidad metálica)
+//   --vs-glow:        rgba(0,180,255,0.18) — glow de plasma
+//   --vs-amber:       #ff6b35   — ámbar (grabando / alerta)
+//   --vs-green:       #00ff9f   — verde eléctrico (positivo / OK)
+// ============================================================
+
+ion-content {
+  --background: #040810;
+}
+
+ion-toolbar {
+  --background: rgba(4, 8, 16, 0.98);
+  --color: #0090e0;
+  --border-color: rgba(0, 180, 255, 0.18);
+}
+
+ion-title {
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #e9ecef;
+}
+
+// ============================================================
+// BANNER DE ZONA PELIGRO — franja de alerta roja (RF-05)
+// ============================================================
+
+.zona-peligro-banner {
+  background: linear-gradient(90deg, #3a0000, #1f0000);
+  border-bottom: 2px solid #ff4444;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: alerta-banner 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes alerta-banner {
+  from { border-bottom-color: #ff4444; }
+  to   { border-bottom-color: #ff0000; box-shadow: 0 2px 12px rgba(255,0,0,0.4); }
+}
+
+// ============================================================
+// BLOQUE VELOCIDAD — Display primario tipo HUD (el más grande)
+// TTC #29: en F1 la velocidad instantánea es el dato principal del
+// display central del volante. En VoltSafe es lo mismo.
+// ============================================================
+
+.speed-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 16px 8px;
+  position: relative;
+}
+
+.speed-value {
+  font-size: 5rem;
+  font-weight: 900;
+  font-family: 'SF Mono', 'Roboto Mono', 'Courier New', monospace;
+  font-variant-numeric: tabular-nums;
+  color: #00c8ff;
+  // Efecto plasma metálico — capas de glow (TTC #29 Tokamak)
+  text-shadow:
+    0 0 8px  rgba(0, 200, 255, 0.9),
+    0 0 20px rgba(0, 180, 255, 0.6),
+    0 0 40px rgba(0, 144, 224, 0.3);
+  line-height: 1;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.speed-value.speed-moving {
+  color: #00e5ff;
+  text-shadow:
+    0 0 10px rgba(0, 229, 255, 1.0),
+    0 0 24px rgba(0, 200, 255, 0.7),
+    0 0 50px rgba(0, 144, 224, 0.4);
+}
+
+.speed-unit {
+  font-size: 0.85rem;
+  color: #4a6080;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-top: 2px;
+  font-family: monospace;
+}
+
+// Indicador de confianza GPS — punto de color sobre la velocidad
+.gps-dot {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  transition: background 0.4s ease, box-shadow 0.4s ease;
+
+  &.gps-alta    { background: #00ff9f; box-shadow: 0 0 8px #00ff9f; }
+  &.gps-media   { background: #ffd43b; box-shadow: 0 0 8px #ffd43b; }
+  &.gps-baja    { background: #ff6b6b; animation: dot-pulse 1s infinite; }
+  &.gps-descarte{ background: #ff0040; animation: dot-pulse 0.5s infinite; }
+}
+
+@keyframes dot-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.2; }
+}
+
+// ============================================================
+// CLUSTER DE INSTRUMENTOS — distancia y duración flanquean la velocidad
+// TTC #29: análogo a los sector times laterales del volante de F1
+// ============================================================
+
+// ============================================================
+// ERS — Energy Recovery System (TTC Formula E / McLaren F1)
+// ============================================================
+
+.ers-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px 10px;
+}
+
+.ers-tag {
+  font-size: 0.55rem;
+  color: #2a4060;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-family: 'SF Mono', 'Roboto Mono', monospace;
+  width: 22px;
+  flex-shrink: 0;
+}
+
+.ers-track {
+  flex: 1;
+  height: 8px;
+  background: rgba(0, 20, 50, 0.8);
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 180, 255, 0.15);
+}
+
+.ers-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1), background 0.6s ease;
+
+  &.ers-ok {
+    background: linear-gradient(90deg, #00ff9f 0%, #00c8ff 100%);
+    box-shadow: 0 0 6px rgba(0, 200, 255, 0.4);
+  }
+  &.ers-warn {
+    background: linear-gradient(90deg, #ffd43b 0%, #ff9900 100%);
+    box-shadow: 0 0 6px rgba(255, 180, 0, 0.35);
+  }
+  &.ers-crit {
+    background: linear-gradient(90deg, #ff4444 0%, #ff0040 100%);
+    animation: ers-critical-pulse 0.7s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes ers-critical-pulse {
+  from { opacity: 1;   box-shadow: 0 0 8px  rgba(255, 0, 40, 0.6); }
+  to   { opacity: 0.6; box-shadow: 0 0 14px rgba(255, 0, 40, 0.9); }
+}
+
+.ers-pct {
+  font-size: 0.65rem;
+  font-family: 'SF Mono', 'Roboto Mono', monospace;
+  font-variant-numeric: tabular-nums;
+  color: #2a4060;
+  width: 30px;
+  text-align: right;
+  flex-shrink: 0;
+  transition: color 0.5s ease;
+}
+
+.ers-pct-crit {
+  color: #ff4444;
+  animation: alerta-pulso 0.7s ease-in-out infinite alternate;
+}
+
+// ============================================================
+// CLUSTER DE INSTRUMENTOS — 3 sectores F1
+// ============================================================
+
+.instruments-cluster {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 6px;
+  padding: 0 16px 8px;
+}
+
+.instrument-card {
+  background: linear-gradient(135deg, rgba(0, 50, 120, 0.18), rgba(4, 8, 22, 0.85));
+  border: 1px solid rgba(0, 180, 255, 0.18);
+  border-radius: 10px;
+  padding: 10px 14px;
+  box-shadow:
+    0 0 16px rgba(0, 180, 255, 0.07),
+    inset 0 1px 0 rgba(0, 200, 255, 0.08);
+  text-align: center;
+}
+
+.instrument-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  font-family: 'SF Mono', 'Roboto Mono', monospace;
+  font-variant-numeric: tabular-nums;
+  color: #00c8ff;
+  text-shadow: 0 0 12px rgba(0, 200, 255, 0.5);
+  display: block;
+  line-height: 1.1;
+}
+
+.instrument-label {
+  font-size: 0.65rem;
+  color: #3a5070;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 3px;
+  display: block;
+}
+
+// ============================================================
+// EXTERNALIDADES EN VIVO — strip horizontal compacto (RF-09)
+// TTC #29: en F1 el DRS disponible / batería restante aparecen
+// como tiras de información compactas en el lateral del display
+// ============================================================
+
+.ext-live-strip {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 6px;
+  padding: 4px 16px 8px;
+}
+
+.ext-chip {
+  background: rgba(0, 30, 70, 0.6);
+  border: 1px solid rgba(0, 180, 255, 0.12);
+  border-radius: 8px;
+  padding: 6px 8px;
+  text-align: center;
+}
+
+.ext-chip-value {
+  font-size: 0.85rem;
+  font-weight: 700;
+  font-family: monospace;
+  display: block;
+  line-height: 1;
+}
+
+.ext-chip-label {
+  font-size: 0.58rem;
+  color: #3a5070;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+  display: block;
+}
+
+// ============================================================
+// DEAD MAN'S SWITCH — barra delgada de seguridad activa (RF-06)
+// ============================================================
+
+.dms-bar {
+  margin: 0 16px 8px;
+  background: rgba(0, 30, 60, 0.7);
+  border: 1px solid rgba(0, 255, 159, 0.2);
+  border-radius: 8px;
+  padding: 7px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.dms-text {
+  font-size: 0.72rem;
+  color: #3a7055;
+}
+
+// ============================================================
+// BOTÓN PRINCIPAL START/STOP
+// Activo: negro + ring ámbar pulsante (grabando)
+// Inactivo: fondo azul eléctrico profundo
+// ============================================================
+
+.action-button-container {
+  padding: 8px 16px 12px;
+}
+
+.action-button {
+  --border-radius: 12px;
+  --padding-top: 14px;
+  --padding-bottom: 14px;
+  height: 58px;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  width: 100%;
+
+  &.btn-iniciando {
+    --background: linear-gradient(135deg, #0060b0, #004488);
+    --box-shadow: 0 0 20px rgba(0,144,224,0.4), 0 0 40px rgba(0,100,200,0.2);
+    border: 1px solid rgba(0, 200, 255, 0.4);
+  }
+
+  &.btn-activo {
+    --background: linear-gradient(135deg, #1a0600, #2a0a00);
+    --box-shadow: 0 0 16px rgba(255,107,53,0.3);
+    border: 1px solid rgba(255,107,53,0.4);
+    animation: btn-recording 2s ease-in-out infinite;
+  }
+}
+
+@keyframes btn-recording {
+  0%, 100% { box-shadow: 0 0 16px rgba(255,107,53,0.3); }
+  50%       { box-shadow: 0 0 28px rgba(255,107,53,0.55); }
+}
+
+// ============================================================
+// RESUMEN POST-SESIÓN (TTC #23 Autodeterminación, Deci & Ryan)
+// ============================================================
+
+.resumen-card {
+  --background: rgba(4, 12, 24, 0.95);
+  border: 1px solid rgba(0, 200, 255, 0.25);
+  border-top: 3px solid #0090e0;
+  margin: 8px 16px 12px;
+  border-radius: 14px;
+  backdrop-filter: blur(8px);
+}
+
+.resumen-valor {
+  font-size: 1.3rem;
+  font-weight: 700;
+  font-family: monospace;
+}
+
+.resumen-etiqueta {
+  font-size: 0.7rem;
+  color: #3a5070;
+  margin-top: 2px;
+}
+
+// ============================================================
+// FAB MORADO — ANIMACIÓN DE PULSO (TTC #10 Bystander Effect)
+// ============================================================
+
+.fab-pulsante {
+  animation: pulso-genero 1.2s ease-in-out infinite;
+}
+
+@keyframes pulso-genero {
+  0%   { box-shadow: 0 0 0 0   rgba(176, 130, 255, 0.6); }
+  50%  { box-shadow: 0 0 0 12px rgba(176, 130, 255, 0); }
+  100% { box-shadow: 0 0 0 0   rgba(176, 130, 255, 0); }
+}

@@ -1,3 +1,12 @@
 <ion-app>
-  <ion-router-outlet></ion-router-outlet>
+  @if (!db.listo()) {
+    <ion-content class="ion-padding ion-text-center" color="dark">
+      <div style="margin-top: 40vh;">
+        <ion-spinner name="crescent" color="success"></ion-spinner>
+        <p style="color: #00ff9f; margin-top: 16px;">{{ db.progreso() }}</p>
+      </div>
+    </ion-content>
+  } @else {
+    <ion-router-outlet></ion-router-outlet>
+  }
 </ion-app>

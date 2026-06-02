@@ -1,0 +1,58 @@
+// ============================================================
+// PERFIL PAGE — Identidad visual: Datos Personales + Protección
+// Color base: #b082ff (morado — privacidad, seguridad de género, datos)
+// Aplica tanto a usuarios de ciclas como de patinetas eléctricas
+// ============================================================
+
+ion-content {
+  --background: linear-gradient(160deg, #0d1117 0%, #100a1f 60%, #120a22 100%);
+}
+
+ion-toolbar {
+  --background: rgba(13, 17, 23, 0.97);
+  --border-color: rgba(176, 130, 255, 0.18);
+}
+
+:host {
+  ion-list {
+    background: transparent;
+  }
+
+  ion-item {
+    --background: rgba(20, 14, 35, 0.7);
+    --border-color: rgba(176, 130, 255, 0.1);
+  }
+
+  ion-label h2 {
+    color: #e9ecef;
+  }
+
+  ion-label p {
+    color: #868e96;
+  }
+}
+
+// Botones SOS — acento morado coherente con identidad de tab
+ion-button[color="tertiary"] {
+  --box-shadow: 0 0 14px rgba(176, 130, 255, 0.25);
+}
+
+// ============================================================
+// SOS VISUAL — ANIMACIÓN DE PULSO (T07-04)
+//
+// TTC #20 — Semiótica de Peirce (Lingüística → UX):
+//   Cuando alertaActiva = true, los botones SOS pasan de Símbolo
+//   (color convencional, arbitrario) a Índice (causalmente conectado
+//   al peligro real detectado por el geofence Haversine).
+//   La sombra roja pulsante ES el peligro — no lo representa: lo señala.
+// ============================================================
+
+.sos-zona-activa ion-button {
+  animation: pulso-sos 0.9s ease-in-out infinite;
+}
+
+@keyframes pulso-sos {
+  0%   { box-shadow: 0 0 0 0  rgba(255, 68, 68, 0.7); }
+  50%  { box-shadow: 0 0 0 14px rgba(255, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0  rgba(255, 68, 68, 0); }
+}

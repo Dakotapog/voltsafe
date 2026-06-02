@@ -1,0 +1,224 @@
+{
+  "type": "FeatureCollection",
+  "_metadata": {
+    "proposito": "Mini-network de prueba para desarrollo y demo. NO reemplaza ciclorrutas_full.geojson de IDECA.",
+    "cobertura": "Chapinero-Centro — zona del Politécnico Grancolombiano y corredores principales",
+    "fecha_curacion": "2026-05-28",
+    "nota": "Trazados aproximados basados en la red real de ciclorrutas de Bogotá. Suficientes para: (1) probar snap-to-segment, (2) verificar rendering Leaflet vector-puro, (3) hacer demo presencial desde campus. Reemplazar por datos IDECA oficiales para E3.",
+    "total_segmentos": 10,
+    "paleta_mapa": {
+      "color_ciclorruta": "#00ff9f",
+      "color_habilitada": "#66bb6a",
+      "fondo_mapa": "#1a1a2e"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "SEG-001",
+        "nombre": "Ciclorruta Carrera 7 (Calle 72 → Calle 26)",
+        "tipo": "permanente",
+        "longitud_m": 5200,
+        "pendiente": 0.0
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-74.0555, 4.6650],
+          [-74.0565, 4.6580],
+          [-74.0580, 4.6520],
+          [-74.0600, 4.6450],
+          [-74.0618, 4.6408],
+          [-74.0635, 4.6350],
+          [-74.0660, 4.6285],
+          [-74.0710, 4.6200],
+          [-74.0755, 4.6013]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "SEG-002",
+        "nombre": "Ciclorruta NQS (Calle 72 → Calle 26)",
+        "tipo": "permanente",
+        "longitud_m": 4100,
+        "pendiente": 0.0
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-74.0700, 4.6650],
+          [-74.0730, 4.6550],
+          [-74.0760, 4.6450],
+          [-74.0800, 4.6364],
+          [-74.0835, 4.6310],
+          [-74.0850, 4.6250],
+          [-74.0912, 4.6130]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "SEG-003",
+        "nombre": "Ciclorruta Calle 26 / Av. El Dorado (Centro → Av. 68)",
+        "tipo": "permanente",
+        "longitud_m": 4800,
+        "pendiente": 0.0
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-74.0755, 4.6310],
+          [-74.0850, 4.6310],
+          [-74.0950, 4.6310],
+          [-74.1050, 4.6310],
+          [-74.1170, 4.6310],
+          [-74.1267, 4.6310]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "SEG-004",
+        "nombre": "Ciclorruta Calle 72 (Carrera 7 → NQS)",
+        "tipo": "permanente",
+        "longitud_m": 1600,
+        "pendiente": 0.0
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-74.0555, 4.6650],
+          [-74.0620, 4.6650],
+          [-74.0700, 4.6650]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "SEG-005",
+        "nombre": "Ciclorruta Autopista Norte (Calle 100 → Portal Norte)",
+        "tipo": "permanente",
+        "longitud_m": 7800,
+        "pendiente": 0.0
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-74.0530, 4.6901],
+          [-74.0510, 4.7000],
+          [-74.0495, 4.7100],
+          [-74.0480, 4.7200],
+          [-74.0470, 4.7320],
+          [-74.0465, 4.7450],
+          [-74.0455, 4.7582]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "SEG-006",
+        "nombre": "Ciclorruta Canal Arzobispo (Carrera 7 → NQS)",
+        "tipo": "permanente",
+        "longitud_m": 2400,
+        "pendiente": 0.0
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-74.0550, 4.6315],
+          [-74.0620, 4.6315],
+          [-74.0690, 4.6315],
+          [-74.0760, 4.6315],
+          [-74.0835, 4.6310]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "SEG-007",
+        "nombre": "Ciclorruta Calle 53 (zona Politécnico — Carrera 11 → NQS)",
+        "tipo": "permanente",
+        "longitud_m": 3600,
+        "pendiente": 0.0,
+        "nota": "Referencia para demo desde campus Politécnico Grancolombiano"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-74.0600, 4.6470],
+          [-74.0650, 4.6470],
+          [-74.0730, 4.6470],
+          [-74.0820, 4.6470],
+          [-74.0900, 4.6470]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "SEG-008",
+        "nombre": "Ciclorruta Av. 68 (Calle 26 → Calle 80)",
+        "tipo": "permanente",
+        "longitud_m": 6500,
+        "pendiente": 0.0
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-74.1170, 4.6310],
+          [-74.1170, 4.6450],
+          [-74.1170, 4.6600],
+          [-74.1170, 4.6750],
+          [-74.1170, 4.6890]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "SEG-009",
+        "nombre": "Ciclorruta Calle 100 (Autopista Norte → NQS)",
+        "tipo": "permanente",
+        "longitud_m": 2000,
+        "pendiente": 0.0
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-74.0530, 4.6901],
+          [-74.0560, 4.6900],
+          [-74.0620, 4.6900],
+          [-74.0700, 4.6900]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "SEG-010",
+        "nombre": "Ciclorruta Calle 80 (NQS → Portal 80)",
+        "tipo": "permanente",
+        "longitud_m": 4500,
+        "pendiente": 0.0
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-74.0700, 4.6890],
+          [-74.0800, 4.6890],
+          [-74.0900, 4.6890],
+          [-74.1000, 4.6890],
+          [-74.1105, 4.6889]
+        ]
+      }
+    }
+  ]
+}

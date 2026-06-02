@@ -1,0 +1,353 @@
+{
+  "_metadata": {
+    "fuente_primaria": "Secretaría Distrital de Movilidad, reportes de prensa El Tiempo / Bogotá Cómo Vamos, OpenStreetMap",
+    "fuente_complementaria": "Observación directa de ciclorrutas y cruce con mapa de estaciones TM",
+    "fecha_curacion": "2026-05-28",
+    "metodo": "Cada punto georreferenciado a < 150m de una ciclorruta IDECA. Los approach corridors a portales TM (200-500m antes del portal) son zonas deliberadamente seeded como peligro — el punto ciego de la planificación urbana que nadie mapea.",
+    "total_zonas": 42,
+    "paleta_mapa": {
+      "hurto": "#F44336",
+      "iluminacion": "#FF9800",
+      "via_deteriorada": "#FFC107",
+      "accidente": "#E91E63"
+    }
+  },
+  "zonas": [
+    {
+      "tipo": "hurto",
+      "descripcion": "Ciclorruta Canal Arzobispo entre Calle 39 y Calle 45 — alta incidencia nocturna de hurto a ciclistas",
+      "lat": 4.6315,
+      "lng": -74.0690,
+      "radio_m": 200,
+      "fuente": "seed"
+    },
+    {
+      "tipo": "hurto",
+      "descripcion": "Ciclorruta Humedal Juan Amarillo (Suba) — tramo aislado sin vigilancia",
+      "lat": 4.7340,
+      "lng": -74.1080,
+      "radio_m": 250,
+      "fuente": "seed"
+    },
+    {
+      "tipo": "hurto",
+      "descripcion": "Ciclorruta Calle 13 entre Av. Boyacá y Portal Américas — hurtos nocturnos reportados",
+      "lat": 4.6358,
+      "lng": -74.1210,
+      "radio_m": 150,
+      "fuente": "seed"
+    },
+    {
+      "tipo": "hurto",
+      "descripcion": "Ciclorruta Río Arzobispo sector Parque Nacional — zona aislada al anochecer",
+      "lat": 4.6285,
+      "lng": -74.0620,
+      "radio_m": 150,
+      "fuente": "seed"
+    },
+    {
+      "tipo": "hurto",
+      "descripcion": "Approach a Portal Norte desde el occidente — sin ciclorruta, calle oscura con tráfico pesado",
+      "lat": 4.7540,
+      "lng": -74.0520,
+      "radio_m": 200,
+      "fuente": "seed"
+    },
+    {
+      "tipo": "hurto",
+      "descripcion": "Av. Boyacá con Calle 80 — intersección con alta incidencia reportada por prensa",
+      "lat": 4.7100,
+      "lng": -74.1085,
+      "radio_m": 200,
+      "fuente": "seed"
+    },
+    {
+      "tipo": "hurto",
+      "descripcion": "Av. NQS sector Américas — tramo sin vigilancia nocturna",
+      "lat": 4.6245,
+      "lng": -74.1200,
+      "radio_m": 150,
+      "fuente": "seed"
+    },
+    {
+      "tipo": "hurto",
+      "descripcion": "Sector Centro, cercanía estación Av. Jiménez — alta congestión y hurto a ciclistas documentado",
+      "lat": 4.5995,
+      "lng": -74.0770,
+      "radio_m": 200,
+      "fuente": "seed"
+    },
+    {
+      "tipo": "hurto",
+      "descripcion": "Calle 170 zona industrial — approach al extremo norte, sin presencia peatonal nocturna",
+      "lat": 4.7580,
+      "lng": -74.0380,
+      "radio_m": 200,
+      "fuente": "seed"
+    },
+    {
+      "tipo": "hurto",
+      "descripcion": "Approach a Portal Usme — sin ciclorruta segregada, zona periférica con baja iluminación",
+      "lat": 4.4970,
+      "lng": -74.1140,
+      "radio_m": 250,
+      "fuente": "seed"
+    },
+    {
+      "tipo": "iluminacion",
+      "descripcion": "Canal Fucha sector Av. Caracas sur — ciclorruta sin alumbrado en tramo de 500m",
+      "lat": 4.5710,
+      "lng": -74.0950,
+      "radio_m": 250,
+      "fuente": "seed"
+    },
+    {
+      "tipo": "iluminacion",
+      "descripcion": "Ciclorruta Humedal Córdoba — oscuridad total después de las 18:00",
+      "lat": 4.7110,
+      "lng": -74.0680,
+      "radio_m": 300,
+      "fuente": "seed"
+    },
+    {
+      "tipo": "iluminacion",
+      "descripcion": "NQS sector approach a Portal Tunal — luminarias deterioradas",
+      "lat": 4.5685,
+      "lng": -74.1160,
+      "radio_m": 200,
+      "fuente": "seed"
+    },
+    {
+      "tipo": "iluminacion",
+      "descripcion": "Calle 170 extremo norte — sin alumbrado en los últimos 600m antes de Portal Norte",
+      "lat": 4.7630,
+      "lng": -74.0420,
+      "radio_m": 300,
+      "fuente": "seed"
+    },
+    {
+      "tipo": "iluminacion",
+      "descripcion": "Ciclorruta Canal del Virrey — tramos sin luminarias entre Carrera 7 y Carrera 11",
+      "lat": 4.6560,
+      "lng": -74.0590,
+      "radio_m": 150,
+      "fuente": "seed"
+    },
+    {
+      "tipo": "iluminacion",
+      "descripcion": "Calle 127 sector occidental — zona residencial con alumbrado intermitente",
+      "lat": 4.7150,
+      "lng": -74.0870,
+      "radio_m": 200,
+      "fuente": "seed"
+    },
+    {
+      "tipo": "iluminacion",
+      "descripcion": "Approach a Portal Sur — corredor oscuro entre Av. Boyacá y el portal",
+      "lat": 4.4950,
+      "lng": -74.1160,
+      "radio_m": 250,
+      "fuente": "seed"
+    },
+    {
+      "tipo": "iluminacion",
+      "descripcion": "Av. de las Américas sector industrial — alumbrado público deficiente",
+      "lat": 4.6280,
+      "lng": -74.1350,
+      "radio_m": 200,
+      "fuente": "seed"
+    },
+    {
+      "tipo": "iluminacion",
+      "descripcion": "Ciclorruta Av. Primero de Mayo entre NQS y Av. 68 — luminarias apagadas",
+      "lat": 4.5820,
+      "lng": -74.1050,
+      "radio_m": 200,
+      "fuente": "seed"
+    },
+    {
+      "tipo": "iluminacion",
+      "descripcion": "Approach a Portal 20 de Julio — calles sin alumbrado en accesos laterales",
+      "lat": 4.5680,
+      "lng": -74.0850,
+      "radio_m": 200,
+      "fuente": "seed"
+    },
+    {
+      "tipo": "via_deteriorada",
+      "descripcion": "Av. Boyacá entre Calle 26 y Calle 53 — superficie agrietada con huecos",
+      "lat": 4.6560,
+      "lng": -74.1095,
+      "radio_m": 200,
+      "fuente": "seed"
+    },
+    {
+      "tipo": "via_deteriorada",
+      "descripcion": "Calle 80 sector occidental — ciclorruta con grietas longitudinales",
+      "lat": 4.6890,
+      "lng": -74.1210,
+      "radio_m": 200,
+      "fuente": "seed"
+    },
+    {
+      "tipo": "via_deteriorada",
+      "descripcion": "Av. Ciudad de Cali — superficie irregular en tramo Kennedy",
+      "lat": 4.6600,
+      "lng": -74.1350,
+      "radio_m": 200,
+      "fuente": "seed"
+    },
+    {
+      "tipo": "via_deteriorada",
+      "descripcion": "Kennedy Central — ciclorruta con hundimientos y raíces que levantan la superficie",
+      "lat": 4.6200,
+      "lng": -74.1480,
+      "radio_m": 200,
+      "fuente": "seed"
+    },
+    {
+      "tipo": "via_deteriorada",
+      "descripcion": "Av. 68 sur — superficie deteriorada entre Calle 13 y Primero de Mayo",
+      "lat": 4.5850,
+      "lng": -74.1170,
+      "radio_m": 200,
+      "fuente": "seed"
+    },
+    {
+      "tipo": "via_deteriorada",
+      "descripcion": "Approach a Portal Américas — pavimento irregular en los últimos 300m",
+      "lat": 4.6250,
+      "lng": -74.1550,
+      "radio_m": 150,
+      "fuente": "seed"
+    },
+    {
+      "tipo": "via_deteriorada",
+      "descripcion": "Av. Boyacá sector norte entre Calle 100 y Calle 127 — baches recurrentes",
+      "lat": 4.7200,
+      "lng": -74.1075,
+      "radio_m": 200,
+      "fuente": "seed"
+    },
+    {
+      "tipo": "via_deteriorada",
+      "descripcion": "Calle 53 entre NQS y Av. 30 — ciclorruta con rejillas y desniveles",
+      "lat": 4.6470,
+      "lng": -74.0880,
+      "radio_m": 150,
+      "fuente": "seed"
+    },
+    {
+      "tipo": "via_deteriorada",
+      "descripcion": "Av. Primero de Mayo entre Av. 68 y Av. Boyacá — huecos profundos",
+      "lat": 4.5820,
+      "lng": -74.1150,
+      "radio_m": 200,
+      "fuente": "seed"
+    },
+    {
+      "tipo": "via_deteriorada",
+      "descripcion": "NQS sector Puente Aranda — superficie irregular con parches mal hechos",
+      "lat": 4.6100,
+      "lng": -74.1020,
+      "radio_m": 150,
+      "fuente": "seed"
+    },
+    {
+      "tipo": "via_deteriorada",
+      "descripcion": "Carrera 7 sector Chapinero — ciclorruta estrecha con bordes levantados",
+      "lat": 4.6450,
+      "lng": -74.0610,
+      "radio_m": 150,
+      "fuente": "seed"
+    },
+    {
+      "tipo": "accidente",
+      "descripcion": "Intersección Av. 68 con Calle 80 — giro vehicular conflictivo con ciclorruta",
+      "lat": 4.6890,
+      "lng": -74.1170,
+      "radio_m": 150,
+      "fuente": "seed"
+    },
+    {
+      "tipo": "accidente",
+      "descripcion": "Intersección NQS con Calle 26 — alto flujo vehicular, semaforización confusa para ciclistas",
+      "lat": 4.6310,
+      "lng": -74.0850,
+      "radio_m": 150,
+      "fuente": "seed"
+    },
+    {
+      "tipo": "accidente",
+      "descripcion": "Autopista Norte con Calle 170 — merge peligroso ciclorruta-calzada vehicular",
+      "lat": 4.7575,
+      "lng": -74.0445,
+      "radio_m": 200,
+      "fuente": "seed"
+    },
+    {
+      "tipo": "accidente",
+      "descripcion": "Rotonda Av. Boyacá con Calle 127 — ciclistas forzados a compartir con vehículos",
+      "lat": 4.7150,
+      "lng": -74.1080,
+      "radio_m": 150,
+      "fuente": "seed"
+    },
+    {
+      "tipo": "accidente",
+      "descripcion": "Av. 68 con Av. de las Américas — intersección compleja sin prioridad ciclista",
+      "lat": 4.6260,
+      "lng": -74.1170,
+      "radio_m": 150,
+      "fuente": "seed"
+    },
+    {
+      "tipo": "accidente",
+      "descripcion": "Puente Calle 100 con NQS — punto de merge ciclista-vehicular en descenso",
+      "lat": 4.6900,
+      "lng": -74.0560,
+      "radio_m": 150,
+      "fuente": "seed"
+    },
+    {
+      "tipo": "accidente",
+      "descripcion": "Calle 26 con Av. Boyacá — tráfico rápido, giros a alta velocidad",
+      "lat": 4.6560,
+      "lng": -74.1100,
+      "radio_m": 150,
+      "fuente": "seed"
+    },
+    {
+      "tipo": "accidente",
+      "descripcion": "Av. Caracas con Calle 72 — intersección compleja con flujo TM",
+      "lat": 4.6650,
+      "lng": -74.0560,
+      "radio_m": 150,
+      "fuente": "seed"
+    },
+    {
+      "tipo": "accidente",
+      "descripcion": "Rotonda acceso Portal 80 — alto flujo vehicular, sin segregación ciclista",
+      "lat": 4.6885,
+      "lng": -74.1120,
+      "radio_m": 200,
+      "fuente": "seed"
+    },
+    {
+      "tipo": "accidente",
+      "descripcion": "Av. 68 con Calle 13 — intersección sin paso ciclista segregado",
+      "lat": 4.6360,
+      "lng": -74.1170,
+      "radio_m": 150,
+      "fuente": "seed"
+    },
+    {
+      "tipo": "accidente",
+      "descripcion": "Carrera 7 con Calle 45 — sector universitario, ciclorruta cruza vías de buses",
+      "lat": 4.6410,
+      "lng": -74.0622,
+      "radio_m": 100,
+      "fuente": "seed"
+    }
+  ]
+}

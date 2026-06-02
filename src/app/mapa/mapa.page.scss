@@ -1,0 +1,225 @@
+// ============================================================
+// MAPA PAGE — Identidad visual: Inteligencia Espacial Urbana
+// Color base: #4dabf7 (cyan datos — GPS, ciclorrutas, zonas)
+// El fondo es el mapa Leaflet (no hay gradiente en content)
+// ============================================================
+
+ion-toolbar {
+  --background: rgba(13, 17, 23, 0.97);
+  --border-color: rgba(77, 171, 247, 0.18);
+}
+
+// Controles superpuestos sobre el mapa con glassmorphism cyan
+.mapa-content {
+  --padding-top: 0;
+  --padding-bottom: 0;
+  --padding-start: 0;
+  --padding-end: 0;
+  --overflow: hidden;
+  position: relative;
+}
+
+#mapa {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.mapa-controles {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  ion-fab-button {
+    --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  }
+}
+
+// ============================================================
+// VIEWER MODE — Tarjeta de telemetría del rider compartido
+// TTC: NASA telemetry dashboards — estado del objeto codificado en URL
+// ============================================================
+
+.viewer-card {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 1000;
+  background: rgba(4, 8, 16, 0.94);
+  border-radius: 12px;
+  padding: 10px 14px;
+  border: 1px solid rgba(0, 200, 255, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  min-width: 200px;
+  box-shadow: 0 0 16px rgba(0, 200, 255, 0.15);
+}
+
+.viewer-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: #868e96;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.viewer-live {
+  color: #00c8ff;
+  font-weight: 700;
+  animation: viewer-blink 1.4s step-end infinite;
+}
+
+@keyframes viewer-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.2; }
+}
+
+.viewer-stats {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.viewer-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.viewer-stat-val {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #00c8ff;
+  line-height: 1;
+}
+
+.viewer-stat-lbl {
+  font-size: 0.65rem;
+  color: #495057;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+// ============================================================
+// T04-07 + T04-09 — Tarjeta de destino activo
+// TTC #23 — Autodeterminación Deci & Ryan: "¿Llego?" vs "X km restantes"
+// ============================================================
+
+.destino-card {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 1000;
+  background: rgba(14, 22, 38, 0.94);
+  border-radius: 10px;
+  padding: 10px 14px;
+  border: 1px solid rgba(255, 107, 107, 0.45);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  min-width: 160px;
+  max-width: 220px;
+}
+
+.destino-km {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #e9ecef;
+  margin-bottom: 4px;
+}
+
+.destino-estado {
+  font-size: 0.78rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.destino-clear {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #aaa;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  cursor: pointer;
+  width: 100%;
+
+  &:hover {
+    background: rgba(255, 107, 107, 0.2);
+    color: #ff6b6b;
+  }
+}
+
+// ============================================================
+// T09-03 — Panel flotante de estaciones TM
+// TTC #22 — Gestalt de Proximidad (Wertheimer, 1923):
+//   La co-presencia espacial con los marcadores azules del mapa
+//   genera agrupación perceptual sin esfuerzo cognitivo.
+// ============================================================
+
+.estaciones-panel {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  right: 16px;
+  z-index: 1000;
+  background: rgba(14, 22, 38, 0.94);
+  border-radius: 12px;
+  padding: 0;
+  border: 1px solid rgba(77, 171, 247, 0.35);
+  max-height: 210px;
+  overflow-y: auto;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.estaciones-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  font-size: 0.78rem;
+  color: #4dabf7;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  text-transform: uppercase;
+}
+
+.estacion-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 7px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.estacion-nombre {
+  font-size: 0.84rem;
+  color: #e9ecef;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.estacion-meta {
+  display: flex;
+  align-items: center;
+  font-size: 0.78rem;
+  color: #868e96;
+  white-space: nowrap;
+  margin-left: 8px;
+  flex-shrink: 0;
+}

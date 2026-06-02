@@ -1,0 +1,89 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      <ion-icon name="flash" style="color:#00ff9f; margin-right:6px; vertical-align:middle;"></ion-icon>
+      VoltSafe
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">VoltSafe</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       RF-01 — Gauge SVG de Autonomía (V4)
+       TTC #13: Planning Fallacy Buffer — arco = estimado conservador
+       TTC #14: Maslow → color del gauge comunica el estado de necesidad
+       Aplica a ciclas eléctricas Y patinetas eléctricas
+       ══════════════════════════════════════════════════════════════ -->
+
+  <app-autonomia-gauge></app-autonomia-gauge>
+
+  <!-- Plan de escape automático — TTC #14: nivel fisiológico de Maslow.
+       Solo visible cuando el estado es NO_RECOMENDADO — sin destino activo.
+       El ciclista/usuario de patineta no busca: la app trae el plan. -->
+  @if (autonomia.estadoAutonomia() === 'NO_RECOMENDADO' && autonomia.planEscape()) {
+    <ion-card class="escape-card">
+      <ion-card-header>
+        <ion-card-subtitle style="color: #4dabf7;">
+          <ion-icon name="train-outline"></ion-icon>
+          Estación TransMilenio más cercana
+        </ion-card-subtitle>
+        <ion-card-title style="color: #ffffff;">
+          {{ autonomia.planEscape()!.estacion.nombre }}
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content style="color: #868e96;">
+        {{ autonomia.planEscape()!.distancia_m | number:'1.0-0' }} m ·
+        {{ autonomia.planEscape()!.estacion.tiene_bicicletero ? '✓ Tiene bicicletero / parqueadero' : 'Sin bicicletero' }}
+      </ion-card-content>
+    </ion-card>
+  }
+
+  <!-- Calculadora manual de pendiente -->
+  <ion-card class="calc-card">
+    <ion-card-header>
+      <ion-card-subtitle>Ajustar por terreno</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-select
+        placeholder="Pendiente del recorrido"
+        (ionChange)="autonomia.calcularManual(deviceMonitor.nivelBateria(), +$any($event).detail.value)"
+        interface="popover">
+        <ion-select-option value="1.0">Plano (Sabana de Bogotá)</ion-select-option>
+        <ion-select-option value="0.85">Moderado (barrios en ladera)</ion-select-option>
+        <ion-select-option value="0.70">Pronunciado (subida fuerte)</ion-select-option>
+      </ion-select>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       RF-09 — Externalidades positivas acumuladas históricamente
+       Movilidad eléctrica personal = impacto ambiental y económico real
+       ══════════════════════════════════════════════════════════════ -->
+
+  <div class="ext-header">Impacto acumulado de tu movilidad eléctrica</div>
+
+  <div class="ext-grid">
+    <div class="ext-card ext-co2">
+      <div class="ext-valor">{{ externalidades.acumuladoHistorico().co2_g | number:'1.0-0' }}</div>
+      <div class="ext-unidad">g CO₂</div>
+      <div class="ext-desc">evitados</div>
+    </div>
+    <div class="ext-card ext-cop">
+      <div class="ext-valor">${{ externalidades.acumuladoHistorico().dinero_cop | number:'1.0-0' }}</div>
+      <div class="ext-unidad">COP</div>
+      <div class="ext-desc">ahorrados vs carro</div>
+    </div>
+    <div class="ext-card ext-kcal">
+      <div class="ext-valor">{{ externalidades.acumuladoHistorico().calorias | number:'1.0-0' }}</div>
+      <div class="ext-unidad">kcal</div>
+      <div class="ext-desc">quemadas</div>
+    </div>
+  </div>
+
+</ion-content>
