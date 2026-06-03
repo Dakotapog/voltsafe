@@ -1,7 +1,6 @@
 import { Injectable, signal, inject } from '@angular/core';
 import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
 import { getDatabase, ref, set, onValue, off, DatabaseReference } from 'firebase/database';
-import { App } from '@capacitor/app';
 import { Geolocation } from '@capacitor/geolocation';
 import { environment } from '../../environments/environment';
 import { GeoService } from './geo.service';
@@ -44,7 +43,6 @@ export class LiveTrackingService {
 
   private app:      FirebaseApp | null = null;
   private intervalo: ReturnType<typeof setInterval> | null = null;
-  private enBackground = false;
   private listenerRef: DatabaseReference | null = null;
 
   private getApp(): FirebaseApp {
@@ -69,23 +67,19 @@ export class LiveTrackingService {
 
   async iniciarPublicacion(sesionId: string): Promise<void> {
     this.sesionId.set(sesionId);
-    this.enBackground = false;
 
     // Asegurar GPS activo — sin watchPosition corriendo, posicionActual() siempre
-    // es null y el fallback getCurrentPosition() devuelve datos cacheados/estáticos.
-    // geo.iniciar() tiene guard "if (activo) return" — seguro si la sesión ya está viva.
+    // es null. geo.iniciar() tiene guard "if (activo) return" — seguro si ya está viva.
     await this.geo.iniciar();
 
-    // Escuchar cambios de estado de la app para pausar en background
-    await App.addListener('appStateChange', ({ isActive }) => {
-      this.enBackground = !isActive;
-    });
-
+    // No usamos appStateChange para pausar: el share dialog nativo dispara
+    // isActive=false pero NO garantiza isActive=true al cerrarse, dejando el
+    // intervalo bloqueado para siempre. Android WebView suspende setInterval
+    // automáticamente cuando la app va a background real — no necesitamos hacerlo
+    // manualmente. El intervalo se reanuda solo al regresar al primer plano.
     await this.publicarPosicion(sesionId); // primer envío inmediato
     this.intervalo = setInterval(() => {
-      if (!this.enBackground) {
-        this.publicarPosicion(sesionId);
-      }
+      this.publicarPosicion(sesionId);
     }, 2000);
   }
 
@@ -94,7 +88,6 @@ export class LiveTrackingService {
       clearInterval(this.intervalo);
       this.intervalo = null;
     }
-    App.removeAllListeners().catch(() => {});
     this.sesionId.set(null);
   }
 
