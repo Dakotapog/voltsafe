@@ -38,6 +38,13 @@ export class GeoService implements OnDestroy {
   /** Posición actual del ciclista. null hasta primer fix GPS válido. */
   readonly posicionActual = signal<PosicionActual | null>(null);
 
+  /**
+   * Posición raw pre-filtro. Actualizada con CADA fix del hardware, sin confidence ring.
+   * Usar exclusivamente para live sharing (LiveTrackingService) donde accuracy 80m es OK.
+   * Para navegación/snap-to-road usar posicionActual().
+   */
+  readonly posicionRaw = signal<PosicionActual | null>(null);
+
   /** Nivel de confianza del último fix GPS */
   readonly nivelConfianza = signal<NivelConfianza>(NivelConfianza.ALTA);
 
@@ -48,18 +55,29 @@ export class GeoService implements OnDestroy {
 
   private watchId: CallbackID | null = null;
   private ultimaPosicion: PosicionActual | null = null;
+  // Referencia para el speed filter — se actualiza con CADA fix que pasa la velocidad,
+  // sin importar el confidence ring. Resuelve el bug donde ultimaPosicion se congelaba
+  // en la primera posición (accuracy <35m) y el speed filter empezaba a rechazar todo.
+  private ultimaPosicionRaw: PosicionActual | null = null;
   private activo = false;
+  /**
+   * Cuando true, fuerza GPS a 1s sin importar el nivel de batería.
+   * Activado por LiveTrackingService — el usuario aceptó el costo de batería al compartir.
+   */
+  private modoTrackingActivo = false;
 
   /** Velocidad máxima física de un ciclista en m/s (~43 km/h, GPS-P1) */
   private readonly VELOCIDAD_MAX_MS = 12.0;
 
-  // Effect: cuando cambia el intervalo GPS por batería, reiniciar watchPosition
+  // Effect: cuando cambia el intervalo GPS por batería, reiniciar watchPosition.
+  // Si modoTrackingActivo: ignora batería y fuerza 1s para que el viewer vea movimiento fluido.
+  // Usa void para manejar la promesa sin bloquear el effect (no puede ser async).
   private readonly intervaloEffect = effect(() => {
     const intervaloMs = this.deviceMonitor.intervaloGpsMs();
     if (this.activo) {
-      // Reiniciar watch con nuevo intervalo
-      this.detenerWatch();
-      this.iniciarWatch(intervaloMs);
+      void this.detenerWatch().then(() =>
+        this.iniciarWatch(this.modoTrackingActivo ? 1000 : intervaloMs)
+      );
     }
   });
 
@@ -90,6 +108,20 @@ export class GeoService implements OnDestroy {
   async detener(): Promise<void> {
     this.activo = false;
     await this.detenerWatch();
+  }
+
+  /**
+   * Fuerza GPS a 1s mientras el usuario está compartiendo ubicación en vivo.
+   * Llama con false al detener la publicación para restaurar el intervalo de batería.
+   */
+  async setModoTracking(activo: boolean): Promise<void> {
+    if (this.modoTrackingActivo === activo) return;
+    this.modoTrackingActivo = activo;
+    if (this.activo) {
+      await this.detenerWatch();
+      const intervaloMs = activo ? 1000 : this.deviceMonitor.intervaloGpsMs();
+      await this.iniciarWatch(intervaloMs);
+    }
   }
 
   // ============================================================
@@ -130,56 +162,51 @@ export class GeoService implements OnDestroy {
     const timestamp = position.timestamp;
 
     // ---- GPS-P1: Filtro de velocidad física ----
+    // Usa ultimaPosicionRaw (siempre actualizada) — no ultimaPosicion que se congela
+    // cuando accuracy >= 35m (DESCARTE) en entornos urbanos como Bogotá.
     if (!this.esMovimientoFisicamentePosible(lat, lng, timestamp)) {
-      // Salto de multipath — descartar silenciosamente
       return;
     }
 
+    // Actualizar referencia del speed filter SIEMPRE que pase la velocidad.
+    // Este es el fix del bug raíz: ultimaPosicionRaw nunca se congela.
+    const posRaw: PosicionActual = { lat, lng, accuracy: accuracy ?? 50, timestamp };
+    this.ultimaPosicionRaw = posRaw;
+    this.posicionRaw.set(posRaw);
+
     // ---- TTC: Temporal Confidence Decay ----
-    // La incertidumbre crece entre fixes. Si el GPS no actualiza en 15s
-    // y el ciclista va a 20km/h, el drift real es ~83m.
-    // Esto unifica Estrategia-Bateria-Adaptativa con Confidence Ring.
     let effectiveAccuracy = accuracy ?? 10;
     if (this.ultimaPosicion) {
       const dtS = (timestamp - this.ultimaPosicion.timestamp) / 1000;
       const driftM = this.velocidadMS() * dtS;
       effectiveAccuracy = Math.max(effectiveAccuracy, effectiveAccuracy + driftM * 0.5);
-      // Factor 0.5: el GPS ya corrige parcialmente el drift al fijar
     }
 
-    // ---- GPS-P3: Confidence Ring — selector de estrategia ----
+    // ---- GPS-P3: Confidence Ring ----
     const nivel = clasificarConfianza(effectiveAccuracy);
     this.nivelConfianza.set(nivel);
 
-    // Actualizar velocidad estimada
-    if (this.ultimaPosicion) {
-      const dtS = (timestamp - this.ultimaPosicion.timestamp) / 1000;
+    // Velocidad estimada — usa ultimaPosicionRaw para mayor frecuencia de actualización
+    if (this.ultimaPosicionRaw) {
+      const dtS = (timestamp - this.ultimaPosicionRaw.timestamp) / 1000;
       if (dtS > 0) {
         const distM = haversine(
-          this.ultimaPosicion.lat,
-          this.ultimaPosicion.lng,
+          this.ultimaPosicionRaw.lat,
+          this.ultimaPosicionRaw.lng,
           lat,
           lng
         );
-        this.velocidadMS.set(distM / dtS);
+        // Solo actualizar si hay movimiento real (evita 0 m/s por mismo timestamp)
+        if (distM > 0) this.velocidadMS.set(distM / dtS);
       }
     }
 
-    // Según anillo de confianza, decidir qué hacer
     if (nivel === NivelConfianza.DESCARTE) {
-      // GPS inutilizable — no actualizar posición (dead reckoning futuro E3)
+      // accuracy >= 35m: posicionRaw ya actualizada, posicionActual no (snap-to-road)
       return;
     }
 
-    // Para anillos ALTA, MEDIA, BAJA: actualizar posición
-    // (snap-to-segment se hará en MapaService cuando esté implementado)
-    const nuevaPos: PosicionActual = {
-      lat,
-      lng,
-      accuracy: effectiveAccuracy,
-      timestamp,
-    };
-
+    const nuevaPos: PosicionActual = { lat, lng, accuracy: effectiveAccuracy, timestamp };
     this.posicionActual.set(nuevaPos);
     this.ultimaPosicion = nuevaPos;
   }
@@ -200,20 +227,17 @@ export class GeoService implements OnDestroy {
     lng: number,
     timestamp: number
   ): boolean {
-    if (!this.ultimaPosicion) return true;
+    // Usa ultimaPosicionRaw (no ultimaPosicion) — se actualiza con cada fix válido
+    // sin importar el confidence ring. Evita que el speed filter rechace posiciones
+    // reales cuando ultimaPosicion lleva minutos congelada por DESCARTE.
+    const ref = this.ultimaPosicionRaw;
+    if (!ref) return true;
 
-    const dtS = (timestamp - this.ultimaPosicion.timestamp) / 1000;
-    if (dtS <= 0) return true; // timestamps idénticos — aceptar
+    const dtS = (timestamp - ref.timestamp) / 1000;
+    if (dtS <= 0) return true;
 
-    const distM = haversine(
-      this.ultimaPosicion.lat,
-      this.ultimaPosicion.lng,
-      lat,
-      lng
-    );
-    const velocidadMS = distM / dtS;
-
-    return velocidadMS <= this.VELOCIDAD_MAX_MS;
+    const distM = haversine(ref.lat, ref.lng, lat, lng);
+    return (distM / dtS) <= this.VELOCIDAD_MAX_MS;
   }
 
   ngOnDestroy(): void {

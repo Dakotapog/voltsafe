@@ -68,3 +68,19 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# Android build artifacts (excluir compilados, mantener fuente nativa)
+android/build/
+android/app/build/
+android/.gradle/
+android/.idea/
+android/captures/
+android/local.properties
+
+# Seguridad — keystore NO en repositorio público
+*.keystore
+*.jks
+
+# APK / Bundle
+*.apk
+*.aab

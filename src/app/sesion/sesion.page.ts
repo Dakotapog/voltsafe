@@ -354,7 +354,7 @@ export class SesionPage {
 
   /** Detiene el tracking en vivo si está activo */
   detenerEnVivo(): void {
-    this.liveTracking.detenerPublicacion();
+    void this.liveTracking.detenerPublicacion();
   }
 
   async confirmarLlegada(): Promise<void> {

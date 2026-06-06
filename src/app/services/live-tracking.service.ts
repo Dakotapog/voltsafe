@@ -17,6 +17,8 @@ export interface PosicionViva {
   bri:      string;
   accuracy: number;
   ts:       number;
+  /** Contador monotónico. Garantiza que Firebase onValue dispare aunque lat/lng no cambien (semáforo, pausa). */
+  seq:      number;
 }
 
 /**
@@ -44,6 +46,7 @@ export class LiveTrackingService {
   private app:      FirebaseApp | null = null;
   private intervalo: ReturnType<typeof setInterval> | null = null;
   private listenerRef: DatabaseReference | null = null;
+  private seq = 0;
 
   private getApp(): FirebaseApp {
     if (this.app) return this.app;
@@ -67,48 +70,46 @@ export class LiveTrackingService {
 
   async iniciarPublicacion(sesionId: string): Promise<void> {
     this.sesionId.set(sesionId);
+    this.seq = 0;
 
-    // Asegurar GPS activo — sin watchPosition corriendo, posicionActual() siempre
-    // es null. geo.iniciar() tiene guard "if (activo) return" — seguro si ya está viva.
+    // GPS activo a 1s — usuario aceptó costo de batería al compartir.
     await this.geo.iniciar();
+    await this.geo.setModoTracking(true);
 
-    // No usamos appStateChange para pausar: el share dialog nativo dispara
-    // isActive=false pero NO garantiza isActive=true al cerrarse, dejando el
-    // intervalo bloqueado para siempre. Android WebView suspende setInterval
-    // automáticamente cuando la app va a background real — no necesitamos hacerlo
-    // manualmente. El intervalo se reanuda solo al regresar al primer plano.
     await this.publicarPosicion(sesionId); // primer envío inmediato
     this.intervalo = setInterval(() => {
       this.publicarPosicion(sesionId);
     }, 2000);
   }
 
-  detenerPublicacion(): void {
+  async detenerPublicacion(): Promise<void> {
     if (this.intervalo !== null) {
       clearInterval(this.intervalo);
       this.intervalo = null;
     }
+    await this.geo.setModoTracking(false); // restaurar intervalo adaptativo de batería
     this.sesionId.set(null);
   }
 
   private async publicarPosicion(sesionId: string): Promise<void> {
-    // Preferir el Signal (ya calculado, filtrado) — fallback a getCurrentPosition
-    // cuando posicionActual es null (primera carga o browser sin GPS continuo).
+    // posicionRaw() bypasa el filtro NivelConfianza.DESCARTE de GeoService.
+    // En Bogotá urbano, accuracy 35-80m es lo normal y suficiente para live sharing.
+    // posicionActual() queda para snap-to-road donde sí importa precisión métrica.
     let lat: number, lng: number, accuracy: number;
-    const posSignal = this.geo.posicionActual();
+    const raw = this.geo.posicionRaw() ?? this.geo.posicionActual();
 
-    if (posSignal) {
-      lat      = posSignal.lat;
-      lng      = posSignal.lng;
-      accuracy = posSignal.accuracy ?? 15;
+    if (raw) {
+      lat      = raw.lat;
+      lng      = raw.lng;
+      accuracy = raw.accuracy;
     } else {
       try {
-        const raw = await Geolocation.getCurrentPosition({ enableHighAccuracy: true, timeout: 5000 });
-        lat      = raw.coords.latitude;
-        lng      = raw.coords.longitude;
-        accuracy = raw.coords.accuracy ?? 15;
+        const fix = await Geolocation.getCurrentPosition({ enableHighAccuracy: true, timeout: 5000 });
+        lat      = fix.coords.latitude;
+        lng      = fix.coords.longitude;
+        accuracy = fix.coords.accuracy ?? 50;
       } catch {
-        return; // GPS sin fix aún — reintentar en próximo intervalo (watchPosition llegará pronto)
+        return; // GPS sin fix aún — reintentar en próximo intervalo
       }
     }
 
@@ -123,6 +124,7 @@ export class LiveTrackingService {
       bri:      this.superficie.briActual(),
       accuracy,
       ts:       Date.now(),
+      seq:      ++this.seq,
     };
     await set(posRef, datos).catch((err) =>
       console.error('[LiveTracking] Error al publicar:', err)

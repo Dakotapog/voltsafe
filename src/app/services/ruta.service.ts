@@ -53,6 +53,10 @@ export class RutaService {
   private _timerInterval: ReturnType<typeof setInterval> | null = null;
   private readonly _ticks = signal(0);
 
+  // Screen Wake Lock — mantiene pantalla encendida durante sesión activa.
+  // Sin esto Android entra en Doze mode y mata GPS + setInterval + Firebase.
+  private wakeLock: WakeLockSentinel | null = null;
+
   /** Duración de la sesión actual en segundos */
   readonly duracion_s = computed(() => {
     this._ticks();
@@ -60,9 +64,12 @@ export class RutaService {
     return Math.round((Date.now() - this.inicioTimestamp) / 1000);
   });
 
-  // Effect: cada vez que posicionActual cambia, acumular distancia
+  // Effect: cada vez que llega un fix GPS válido, acumular distancia.
+  // Lee posicionRaw (post-speed-filter, pre-confidence-ring) porque en Bogotá
+  // urbano accuracy 35-80m es normal y no invalida el movimiento real del usuario.
+  // posicionActual() queda para snap-to-road donde sí importa la precisión métrica.
   private readonly posicionEffect = effect(() => {
-    const pos = this.geo.posicionActual();
+    const pos = this.geo.posicionRaw();
     if (pos && this.sesionActiva()) {
       this.agregarPunto(pos);
     }
@@ -104,6 +111,9 @@ export class RutaService {
     // Arrancar GPS
     await this.geo.iniciar();
 
+    // Mantener pantalla encendida — sin esto Android Doze mata GPS + Firebase a los 2 min
+    await this.adquirirWakeLock();
+
     // Iniciar timer — setInterval zone-tracked garantiza CD cada segundo
     this._ticks.set(0);
     this._timerInterval = setInterval(() => this._ticks.update(n => n + 1), 1000);
@@ -126,6 +136,9 @@ export class RutaService {
       clearInterval(this._timerInterval);
       this._timerInterval = null;
     }
+
+    // Liberar wake lock — pantalla puede apagarse normalmente
+    await this.liberarWakeLock();
 
     // Detener GPS
     await this.geo.detener();
@@ -189,6 +202,36 @@ export class RutaService {
       'INSERT INTO puntos_ruta (sesion_id, lat, lng, timestamp, foto_path) VALUES (?, ?, ?, ?, ?)',
       [id, lat, lng, new Date().toISOString(), webPath]
     );
+  }
+
+  // ============================================================
+  // ACUMULACIÓN DE TRACK
+  // ============================================================
+
+  // ============================================================
+  // SCREEN WAKE LOCK
+  // ============================================================
+
+  private async adquirirWakeLock(): Promise<void> {
+    if (!('wakeLock' in navigator)) return;
+    try {
+      this.wakeLock = await navigator.wakeLock.request('screen');
+      // Si Android libera el lock temporalmente (llamada, notificación), re-adquirir
+      this.wakeLock.addEventListener('release', () => {
+        if (this.sesionActiva()) {
+          this.adquirirWakeLock();
+        }
+      });
+    } catch (err) {
+      console.error('[RutaService] WakeLock no disponible:', err);
+    }
+  }
+
+  private async liberarWakeLock(): Promise<void> {
+    if (this.wakeLock) {
+      await this.wakeLock.release().catch(() => {});
+      this.wakeLock = null;
+    }
   }
 
   // ============================================================
