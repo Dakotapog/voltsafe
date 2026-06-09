@@ -34,23 +34,16 @@ ion-toolbar {
   margin: 4px 16px 8px;
 }
 
-.calc-card {
-  --background: rgba(18, 22, 30, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 14px;
-  margin: 4px 16px 8px;
-}
-
 // ============================================================
 // Grid de externalidades — 3 columnas compactas
 // ============================================================
 
 .ext-header {
   font-size: 0.72rem;
-  color: #4a5568;
+  color: #c8ff00;
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  padding: 8px 20px 4px;
+  padding: 20px 20px 4px;
 }
 
 .ext-grid {
@@ -73,47 +66,126 @@ ion-toolbar {
 .ext-card.ext-kcal { border-top: 2px solid #f783ac; }
 
 .ext-valor {
-  font-size: 1.1rem;
+  font-size: 1.4rem;
   font-weight: 700;
-  color: #e9ecef;
+  color: #00e5ff;
   line-height: 1.2;
 }
 
 .ext-unidad {
-  font-size: 0.65rem;
-  color: #52637a;
+  font-size: 0.78rem;
+  color: #c8ff00;
   margin-top: 2px;
 }
 
 .ext-desc {
-  font-size: 0.62rem;
-  color: #3d4a5c;
+  font-size: 0.72rem;
+  color: #c8ff00;
   margin-top: 1px;
 }
 
-// Valores clave de autonomía — visibilidad máxima
-.autonomia-valor {
+// ============================================================
+// Selector batería vehículo eléctrico — bloques Li-ion
+// ============================================================
+
+.vehicle-bat-card {
+  --background: rgba(18, 22, 30, 0.88);
+  border: 1px solid rgba(0, 255, 159, 0.18);
+  border-radius: 14px;
+  margin: 4px 16px 8px;
+}
+
+.bat-blocks-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.bat-block {
+  flex: 1;
+  height: 32px;
+  border-radius: 6px;
+  border: 2px solid rgba(0, 255, 159, 0.25);
+  background: rgba(0, 40, 20, 0.4);
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.1s;
+  padding: 0;
+
+  &:active { transform: scale(0.94); }
+
+  &.bat-block-active {
+    background: linear-gradient(135deg, #00ff9f, #00c8ff);
+    border-color: #00ff9f;
+    box-shadow: 0 0 8px rgba(0, 255, 159, 0.4);
+  }
+
+  &.bat-block-crit {
+    background: #ff6b6b;
+    border-color: #ff4444;
+    box-shadow: 0 0 8px rgba(255, 68, 68, 0.5);
+    animation: bat-crit-pulse 0.9s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes bat-crit-pulse {
+  from { opacity: 1; }
+  to   { opacity: 0.55; }
+}
+
+.bat-pct-label {
+  font-size: 0.78rem;
+  font-family: 'Roboto Mono', monospace;
   color: #00ff9f;
-  text-shadow: 0 0 16px rgba(0, 255, 159, 0.35);
-  font-size: 3rem;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
+  min-width: 38px;
+  text-align: right;
+  font-weight: 600;
 }
 
-.autonomia-label {
-  color: #52c48a;
-  font-size: 0.85rem;
+// Preview de km por modo de velocidad — "bingo fuel"
+.vel-preview {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+
+.vel-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 6px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(12, 18, 24, 0.7);
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+
+  &.vel-btn-active {
+    border-color: rgba(0, 200, 255, 0.5);
+    background: rgba(0, 50, 80, 0.6);
+    box-shadow: 0 0 10px rgba(0, 200, 255, 0.15);
+  }
+
+  &:active { transform: scale(0.96); }
+}
+
+.vel-label {
+  font-size: 0.8rem;
+  color: #c8ff00;
+  text-transform: uppercase;
   letter-spacing: 0.5px;
+  margin-bottom: 4px;
 }
 
-// Estado semafórico — coherente para ambos vehículos eléctricos
-.estado-SEGURO       { color: #00ff9f; }
-.estado-PRECAUCION   { color: #ffd43b; }
-.estado-NO_RECOMENDADO { color: #ff6b6b; animation: alerta-pulso 1.5s ease-in-out infinite; }
+.vel-km {
+  font-size: 1.0rem;
+  font-weight: 700;
+  font-family: 'Roboto Mono', monospace;
+  transition: color 0.3s ease;
 
-@keyframes alerta-pulso {
-  0%, 100% { opacity: 1; }
-  50%      { opacity: 0.55; }
+  &.vel-seguro     { color: #00ff9f; }
+  &.vel-precaucion { color: #ffee00; }
+  &.vel-critico    { color: #ff3030; }
 }
 
 // Cards de métricas secundarias

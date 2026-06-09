@@ -30,7 +30,7 @@ import { DeviceMonitorService } from '../services/device-monitor.service';
   template: `
     <div class="gauge-wrapper">
 
-      <svg viewBox="0 0 200 115" class="gauge-svg" aria-label="Indicador de autonomía">
+      <svg viewBox="0 0 200 128" class="gauge-svg" aria-label="Indicador de autonomía">
 
         <!--
           Anillos de confinamiento plasma — TTC Tokamak ITER
@@ -87,10 +87,9 @@ import { DeviceMonitorService } from '../services/device-monitor.service';
               [attr.fill]="colorEstado()">
           {{ km() | number:'1.0-0' }}
         </text>
-        <text x="100" y="94"
+        <text x="100" y="122"
               text-anchor="middle"
-              class="gauge-unidad"
-              fill="#3a4a5c">km restantes</text>
+              class="gauge-unidad">KM RESTANTES</text>
 
         <!--
           Aguja — TTC: Velocímetro analógico → instrumento físico
@@ -111,8 +110,8 @@ import { DeviceMonitorService } from '../services/device-monitor.service';
         -->
         <g [attr.transform]="'rotate(' + needleDeg() + ', 100, 100)'"
            class="gauge-needle-group">
-          <!-- Contrapeso corto (lado opuesto) -->
-          <line x1="100" y1="100" x2="72" y2="100"
+          <!-- Contrapeso (18px) — viewBox 128px garantiza que no desborda -->
+          <line x1="100" y1="100" x2="82" y2="100"
                 [attr.stroke]="colorEstado()" stroke-width="3"
                 stroke-linecap="round" opacity="0.4"/>
           <!-- Aguja principal — larga, hacia el arco -->
@@ -136,6 +135,9 @@ import { DeviceMonitorService } from '../services/device-monitor.service';
         <ion-icon [name]="iconoEstado()" style="vertical-align:middle; margin-right:4px;"></ion-icon>
         {{ etiquetaEstado() }}
       </div>
+
+      <!-- Modo activo — indicador telemetría F1 McLaren -->
+      <div class="gauge-modo-label">{{ modoLabel() }}</div>
 
       <!-- Batería como mini-barra + penalización BRI -->
       <div class="gauge-meta">
@@ -169,7 +171,7 @@ import { DeviceMonitorService } from '../services/device-monitor.service';
     }
     .gauge-svg {
       width: 100%;
-      max-width: 260px;
+      max-width: 300px;
     }
     .gauge-arc-valor {
       transition: d 0.7s cubic-bezier(0.4, 0, 0.2, 1),
@@ -184,21 +186,29 @@ import { DeviceMonitorService } from '../services/device-monitor.service';
       transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .gauge-km {
-      font-size: 34px;
+      font-size: 40px;
       font-weight: 800;
       font-family: 'SF Mono', 'Roboto Mono', monospace;
       transition: fill 0.5s ease;
     }
     .gauge-unidad {
-      font-size: 9px;
-      letter-spacing: 0.8px;
-      text-transform: uppercase;
+      font-size: 8px;
+      letter-spacing: 2px;
+      fill: #c8ff00;
     }
     .gauge-estado {
       font-size: 0.9rem;
       font-weight: 600;
-      margin-top: 2px;
+      margin-top: 10px;
       transition: color 0.5s ease;
+    }
+    .gauge-modo-label {
+      font-size: 0.65rem;
+      letter-spacing: 2.5px;
+      color: #c8ff00;
+      text-transform: uppercase;
+      font-family: 'Roboto Mono', monospace;
+      margin-top: 1px;
     }
     .gauge-meta {
       display: flex;
@@ -217,7 +227,7 @@ import { DeviceMonitorService } from '../services/device-monitor.service';
     .bat-label {
       font-size: 0.7rem;
       font-family: monospace;
-      color: #52637a;
+      color: #c8ff00;
       width: 28px;
       text-align: right;
     }
@@ -260,16 +270,13 @@ export class AutonomiaGaugeComponent {
   private readonly deviceMonitor = inject(DeviceMonitorService);
 
   readonly km      = computed(() => this.autonomia.autonomiaRestante_km());
-  readonly bateria = computed(() => this.deviceMonitor.nivelBateria());
+  readonly bateria = computed(() => this.autonomia.pctRealVehiculo());  // % real vehículo (Li-ion calibrado)
   readonly estado  = computed(() => this.autonomia.estadoAutonomia());
   readonly superficie = computed(() => this.autonomia.factorSuperficie());
 
-  /** Rango máximo típico de un vehículo eléctrico personal en Bogotá */
-  private readonly MAX_KM = 60;
-
   /** Proporción del arco a rellenar (0.001 → 0.999 para evitar degenerate paths) */
   readonly ratio = computed(() =>
-    Math.min(0.999, Math.max(0.001, this.km() / this.MAX_KM))
+    Math.min(0.999, Math.max(0.001, this.km() / this.autonomia.rangoMaximo_km()))
   );
 
   /**
@@ -284,8 +291,9 @@ export class AutonomiaGaugeComponent {
     const angle = Math.PI * (1 - r);
     const endX  = (100 + 82 * Math.cos(angle)).toFixed(1);
     const endY  = (100 - 82 * Math.sin(angle)).toFixed(1);
-    const large = r > 0.5 ? 1 : 0;
-    return `M 18 100 A 82 82 0 ${large} 1 ${endX} ${endY}`;
+    // Siempre small arc (0): el arco del gauge es siempre < 180°.
+    // large=1 forzaría el arco por debajo del viewBox — bug overflow.
+    return `M 18 100 A 82 82 0 0 1 ${endX} ${endY}`;
   });
 
   /**
@@ -316,4 +324,10 @@ export class AutonomiaGaugeComponent {
   readonly penalizacionSup = computed(() =>
     Math.round((1 - 1 / this.superficie()) * 100)
   );
+
+  readonly modoLabel = computed(() => ({
+    vel1: 'ECO  ·  VEL 1',
+    vel2: 'NORMAL  ·  VEL 2',
+    vel3: 'SPORT  ·  VEL 3',
+  }[this.autonomia.modoVelocidad()] ?? ''));
 }

@@ -17,7 +17,6 @@ import {
 } from '../services/genero.service';
 import { SeguridadService } from '../services/seguridad.service';
 import { HapticsService } from '../services/haptics.service';
-import { LiveTrackingService } from '../services/live-tracking.service';
 
 /**
  * SesionPage — Registro de Ruta (Tab 2)
@@ -67,12 +66,8 @@ export class SesionPage {
   private readonly autonomia       = inject(AutonomiaService);
   private readonly seguridad       = inject(SeguridadService);
   private readonly haptics         = inject(HapticsService);
-  private readonly liveTracking    = inject(LiveTrackingService);
   private readonly actionSheetCtrl = inject(ActionSheetController);
   private readonly toastCtrl       = inject(ToastController);
-
-  /** Expone al template para el indicador "EN VIVO" */
-  readonly liveSesionId = this.liveTracking.sesionId;
 
   /**
    * Resumen de la última sesión finalizada.
@@ -320,41 +315,6 @@ export class SesionPage {
   /** Abre selector nativo — comparte ubicación con cualquier app o contacto */
   async compartirConCualquiera(): Promise<void> {
     await this.seguridad.compartirConCualquiera();
-  }
-
-  /**
-   * Inicia tracking en vivo vía Firebase y comparte el link de seguimiento.
-   * Si ya hay una sesión activa, muestra el link para copiarlo de nuevo.
-   */
-  async compartirEnVivo(): Promise<void> {
-    let sesionId = this.liveTracking.sesionId();
-
-    if (!sesionId) {
-      sesionId = this.liveTracking.generarSesionId();
-      await this.liveTracking.iniciarPublicacion(sesionId);
-    }
-
-    const url = this.liveTracking.generarURLViewer(sesionId);
-    const texto = `📡 Sígueme en tiempo real:\n${url}`;
-
-    const { Share } = await import('@capacitor/share');
-    await Share.share({
-      title: 'VoltSafe — Seguimiento en vivo',
-      text: texto,
-      url,
-      dialogTitle: 'Compartir link de seguimiento',
-    }).catch(() => {
-      // Fallback: abrir WhatsApp con el link
-      window.open(
-        `https://wa.me/?text=${encodeURIComponent(texto)}`,
-        '_system'
-      );
-    });
-  }
-
-  /** Detiene el tracking en vivo si está activo */
-  detenerEnVivo(): void {
-    void this.liveTracking.detenerPublicacion();
   }
 
   async confirmarLlegada(): Promise<void> {

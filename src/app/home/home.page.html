@@ -44,20 +44,53 @@
     </ion-card>
   }
 
-  <!-- Calculadora manual de pendiente -->
-  <ion-card class="calc-card">
+  <!-- RF-01 — Selector de batería del vehículo eléctrico -->
+  <!-- TTC: bloques Li-ion no lineales (electroquímica) + aerodinámica cuadrática (v²) -->
+  <ion-card class="vehicle-bat-card">
     <ion-card-header>
-      <ion-card-subtitle>Ajustar por terreno</ion-card-subtitle>
+      <ion-card-subtitle>Batería del vehículo eléctrico</ion-card-subtitle>
     </ion-card-header>
     <ion-card-content>
-      <ion-select
-        placeholder="Pendiente del recorrido"
-        (ionChange)="autonomia.calcularManual(deviceMonitor.nivelBateria(), +$any($event).detail.value)"
-        interface="popover">
-        <ion-select-option value="1.0">Plano (Sabana de Bogotá)</ion-select-option>
-        <ion-select-option value="0.85">Moderado (barrios en ladera)</ion-select-option>
-        <ion-select-option value="0.70">Pronunciado (subida fuerte)</ion-select-option>
-      </ion-select>
+
+      <!-- 5 bloques tapeables — calibrados con curva de descarga Li-ion real -->
+      <!-- Bloque 1 = ~5% real (colapso no lineal), NO el 20% que parece -->
+      <div class="bat-blocks-row">
+        @for (b of bloquesList; track b) {
+          <button class="bat-block"
+                  [class.bat-block-active]="autonomia.bloquesVehiculo() >= b"
+                  [class.bat-block-crit]="autonomia.bloquesVehiculo() <= 2 && b <= autonomia.bloquesVehiculo()"
+                  (click)="autonomia.setBloques(b)">
+          </button>
+        }
+        <span class="bat-pct-label">~{{ autonomia.pctRealVehiculo() }}%</span>
+      </div>
+
+      <!-- Preview simultáneo de autonomía en los 3 modos — "bingo fuel" aéreo -->
+      <!-- Permite decidir: ¿llego a casa en Vel 2 o solo en Vel 1? -->
+      <div class="vel-preview">
+        <button class="vel-btn" [class.vel-btn-active]="autonomia.modoVelocidad() === 'vel1'"
+                (click)="autonomia.setModoVelocidad('vel1')">
+          <span class="vel-label">Vel 1</span>
+          <span class="vel-km" [class]="'vel-' + getKmEstado(autonomia.kmPorModo().vel1)">
+            {{ autonomia.kmPorModo().vel1 }} km
+          </span>
+        </button>
+        <button class="vel-btn" [class.vel-btn-active]="autonomia.modoVelocidad() === 'vel2'"
+                (click)="autonomia.setModoVelocidad('vel2')">
+          <span class="vel-label">Vel 2</span>
+          <span class="vel-km" [class]="'vel-' + getKmEstado(autonomia.kmPorModo().vel2)">
+            {{ autonomia.kmPorModo().vel2 }} km
+          </span>
+        </button>
+        <button class="vel-btn" [class.vel-btn-active]="autonomia.modoVelocidad() === 'vel3'"
+                (click)="autonomia.setModoVelocidad('vel3')">
+          <span class="vel-label">Vel 3</span>
+          <span class="vel-km" [class]="'vel-' + getKmEstado(autonomia.kmPorModo().vel3)">
+            {{ autonomia.kmPorModo().vel3 }} km
+          </span>
+        </button>
+      </div>
+
     </ion-card-content>
   </ion-card>
 

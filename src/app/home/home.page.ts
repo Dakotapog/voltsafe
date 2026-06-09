@@ -1,6 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { ExternalidadesService } from '../services/externalidades.service';
-import { DeviceMonitorService } from '../services/device-monitor.service';
 import { AutonomiaService } from '../services/autonomia.service';
 
 /**
@@ -24,10 +23,19 @@ import { AutonomiaService } from '../services/autonomia.service';
 })
 export class HomePage implements OnInit {
   readonly externalidades = inject(ExternalidadesService);
-  readonly deviceMonitor  = inject(DeviceMonitorService);
   readonly autonomia      = inject(AutonomiaService);
+
+  readonly bloquesList = [1, 2, 3, 4, 5];
 
   async ngOnInit(): Promise<void> {
     await this.autonomia.inicializar();
+  }
+
+  /** Estado semafórico para el preview de km por modo — proporcional al rango configurado */
+  getKmEstado(km: number): string {
+    const max = this.autonomia.rangoMaximo_km();
+    if (km >= max * 0.30) return 'seguro';
+    if (km >= max * 0.15) return 'precaucion';
+    return 'critico';
   }
 }

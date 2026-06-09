@@ -130,6 +130,61 @@ export class AutonomiaService {
   /** Rango máximo configurado por el usuario (Storage) */
   readonly rangoMaximo_km = signal(RANGO_DEFAULT_KM);
 
+  // ── Batería del vehículo eléctrico — curva Li-ion no lineal ──────────
+  //
+  // TTC NUEVO — Electroquímica (dominio: ingeniería de celdas Li-ion)
+  // Los 5 bloques del display NO son 20/40/60/80/100%.
+  // Son umbrales de voltaje en la curva de descarga (36V/48V pack).
+  // La curva cae linealmente de 4.2V→3.7V/celda (bloques 5→3)
+  // y colapsa exponencialmente de 3.7V→3.0V (bloques 2→1).
+  // El bloque 1 tiene ~5% de capacidad real — NO el 20% que aparenta.
+  // Este es el motivo por el que las patinetas "mueren de repente".
+  //
+  // TTC NUEVO — Aerodinámica cuadrática (F=½ρCdAv²)
+  // Velocidad doble → 4× la fuerza de arrastre → ~2× el consumo.
+  // Vel 3 (~30 km/h) consume 44% más batería que Vel 1 (~15 km/h).
+  // El usuario puede calcular si puede llegar a casa en cada modo.
+
+  private readonly BLOQUES_A_PCT: Record<number, number> = {
+    5: 85,  // BMS 80-100% → conservador: 85%
+    4: 55,  // BMS 50-75%  → conservador: 55%
+    3: 30,  // BMS 25-45%  → conservador: 30%
+    2: 13,  // BMS 10-20%  → conservador: 13%
+    1:  5,  // BMS 2-10%   → conservador:  5% ← colapso no lineal
+  };
+
+  /** Bloques de batería seleccionados por el usuario (1-5) */
+  readonly bloquesVehiculo = signal(5);
+
+  /** Modo de velocidad activo del vehículo */
+  readonly modoVelocidad = signal<'vel1' | 'vel2' | 'vel3'>('vel1');
+
+  /** % real de batería, calibrado con curva Li-ion (no lineal) */
+  readonly pctRealVehiculo = computed(() =>
+    this.BLOQUES_A_PCT[this.bloquesVehiculo()] ?? 85
+  );
+
+  private readonly factorModo = computed(() => {
+    const m = this.modoVelocidad();
+    return m === 'vel1' ? 1.00 : m === 'vel2' ? 0.76 : 0.56;
+  });
+
+  /** Preview simultáneo de km disponibles en los 3 modos — "bingo fuel" */
+  readonly kmPorModo = computed(() => {
+    const pct   = this.pctRealVehiculo();
+    const rango = this.rangoMaximo_km();
+    const bri   = this.factorSuperficie();
+    const base  = (pct / 100) * rango * PLANNING_FALLACY_BUFFER / bri;
+    return {
+      vel1: Math.round(base * 1.00 * 10) / 10,
+      vel2: Math.round(base * 0.76 * 10) / 10,
+      vel3: Math.round(base * 0.56 * 10) / 10,
+    };
+  });
+
+  setBloques(n: number): void { this.bloquesVehiculo.set(n); }
+  setModoVelocidad(m: 'vel1' | 'vel2' | 'vel3'): void { this.modoVelocidad.set(m); }
+
   /**
    * TTC #14: Maslow automático — cuando estado = NO_RECOMENDADO,
    * este computed expone directamente la proximaEstacion para que
@@ -182,12 +237,13 @@ export class AutonomiaService {
    * Recalcula en cada cambio de distancia, batería o factor BRI.
    */
   private readonly calculoEffect = effect(() => {
-    const distKm    = this.ruta.distanciaAcumulada_km();
-    const bateria   = this.device.nivelBateria();
-    const proximaTM = this.ultimaMilla.proximaEstacion();
-    const factorBRI = this.factorSuperficie();   // CX-01: HDM-4 surface penalty
+    const distKm     = this.ruta.distanciaAcumulada_km();
+    const bateria    = this.pctRealVehiculo();        // batería del vehículo (bloques calibrados)
+    const modoFactor = this.factorModo();             // factor aerodinámica cuadrática por velocidad
+    const proximaTM  = this.ultimaMilla.proximaEstacion();
+    const factorBRI  = this.factorSuperficie();
 
-    this.recalcularDesdeSignals(bateria, distKm, proximaTM?.distancia_m ?? Infinity, 1.0, factorBRI);
+    this.recalcularDesdeSignals(bateria, distKm, proximaTM?.distancia_m ?? Infinity, modoFactor, factorBRI);
   });
 
   // ── Inicialización ───────────────────────────────────────────────
@@ -208,15 +264,15 @@ export class AutonomiaService {
 
   /**
    * Cálculo manual: el usuario ingresa batería% y factor de pendiente.
-   * Usado en HomePage cuando no hay sesión activa.
-   * Aplica el factorSuperficie BRI histórico actual.
+   * Combina pendiente × modo de velocidad activo para el factor de consumo total.
    *
    * @param bateriaPct      Nivel de batería 0-100
    * @param factorPendiente 1.0 plano | 0.85 moderado | 0.70 pronunciado
    */
   calcularManual(bateriaPct: number, factorPendiente = 1.0): void {
     const proximaTM = this.ultimaMilla.proximaEstacion();
-    this.recalcularDesdeSignals(bateriaPct, 0, proximaTM?.distancia_m ?? Infinity, factorPendiente, this.factorSuperficie());
+    const factorTotal = factorPendiente * this.factorModo();
+    this.recalcularDesdeSignals(bateriaPct, 0, proximaTM?.distancia_m ?? Infinity, factorTotal, this.factorSuperficie());
   }
 
   // ── Persistencia de configuración ────────────────────────────────
@@ -253,8 +309,9 @@ export class AutonomiaService {
       if (avgRms < 2)  return 1.00;
       if (avgRms < 8)  return 1.08;
       return 1.15;
-    } catch {
-      return 1.00; // Sin datos históricos: no penalizar
+    } catch (err) {
+      console.error('[AutonomiaService] calcularFactorSuperficie:', err);
+      return 1.00;
     }
   }
 
@@ -264,14 +321,15 @@ export class AutonomiaService {
     bateriaPct: number,
     distanciaRecorridaKm: number,
     distanciaTM_m: number,
-    factorPendiente = 1.0,
+    factorConsumo = 1.0,
     factorBRI = 1.0
   ): void {
     const rangoMax = this.rangoMaximo_km();
 
-    // Rango bruto: batería × rango_max × pendiente ÷ superficie (CX-01 HDM-4)
+    // Rango bruto: batería × rango_max × factorConsumo ÷ superficie (CX-01 HDM-4)
+    // factorConsumo combina pendiente × velocidad (aerodinámica cuadrática)
     // factorBRI > 1.0 → superficie deteriorada → rango reducido
-    const rangoDisponible = (bateriaPct / 100) * rangoMax * factorPendiente / factorBRI;
+    const rangoDisponible = (bateriaPct / 100) * rangoMax * factorConsumo / factorBRI;
 
     // Descontar lo ya recorrido durante la sesión
     const rangoRestante = Math.max(0, rangoDisponible - distanciaRecorridaKm);

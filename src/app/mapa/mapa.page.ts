@@ -12,8 +12,6 @@ import { GeneroService } from '../services/genero.service';
 import { SuperficieService } from '../services/superficie.service';
 import { GeoService } from '../services/geo.service';
 import { AutonomiaService } from '../services/autonomia.service';
-import { ViewerService } from '../services/viewer.service';
-import { LiveTrackingService } from '../services/live-tracking.service';
 
 /**
  * MapaPage — Mapa Leaflet (Tab 3)
@@ -49,8 +47,6 @@ export class MapaPage implements AfterViewInit, OnDestroy {
   readonly mapaService    = inject(MapaService);
   readonly ultimaMilla    = inject(UltimaMillaService);
   readonly autonomia      = inject(AutonomiaService);
-  readonly viewer         = inject(ViewerService);
-  readonly liveTracking   = inject(LiveTrackingService); // público — tarjeta live en template
   private readonly zonas  = inject(ZonasService);
   private readonly genero = inject(GeneroService);
   private readonly superficie   = inject(SuperficieService);
@@ -74,22 +70,9 @@ export class MapaPage implements AfterViewInit, OnDestroy {
     // El tab ya terminó su animación — el contenedor tiene dimensiones reales
     this.mapaService.invalidarTamano();
 
-    const sessionId = this.viewer.liveSessionId(); // contiene sesionId del ?sesion= param
-    const vp = this.viewer.params();
-
-    if (sessionId) {
-      // Viewer live: suscribir a Firebase, actualizar marcador en tiempo real
-      this.liveTracking.suscribirSesion(sessionId, (pos) => {
-        this.mapaService.moverMarcadorViewer(pos.lat, pos.lng);
-      });
-    } else if (vp) {
-      // Viewer snapshot: mostrar posición fija de la URL
-      this.mapaService.colocarMarcadorViewer(vp.lat, vp.lng);
-    } else {
-      // Modo normal: Iniciar GPS para mostrar posición en el mapa.
-      // geo.iniciar() tiene guard if(activo) return — no duplica si ya corre sesión.
-      this.geo.iniciar();
-    }
+    // Modo normal: Iniciar GPS para mostrar posición en el mapa.
+    // geo.iniciar() tiene guard if(activo) return — no duplica si ya corre sesión.
+    this.geo.iniciar();
 
     if (!this.capasInicializadas) {
       this.capasInicializadas = true;
@@ -104,25 +87,11 @@ export class MapaPage implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.liveTracking.desuscribir();
     this.mapaService.destruirMapa();
     this.capasInicializadas = false;
   }
 
   centrar(): void {
-    // Viewer live: centrar en última posición recibida de Firebase
-    const posViva = this.liveTracking.posicionViva();
-    if (posViva) {
-      this.mapaService.centrarEnPosicion(posViva.lat, posViva.lng);
-      return;
-    }
-    // Viewer snapshot: centrar en posición de URL params
-    const vp = this.viewer.params();
-    if (vp) {
-      this.mapaService.centrarEnPosicion(vp.lat, vp.lng);
-      return;
-    }
-    // Modo normal: GPS propio del usuario
     this.mapaService.centrarEnUsuario();
   }
 
